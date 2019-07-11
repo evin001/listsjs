@@ -7,13 +7,31 @@
     "target": "esnext",
     "jsx": "react",
     "allowJs": true,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
     "strict": true,
+    "noEmit": true,
+    "experimentalDecorators": true,
+    "baseUrl": "./",
+    "allowSyntheticDefaultImports": true,
+    "noErrorTruncation": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "noEmit": true
+    "paths": {
+      "@material-ui/core": ["./packages/material-ui/src"],
+      "@material-ui/core/*": ["./packages/material-ui/src/*"],
+      "@material-ui/lab": ["./packages/material-ui-lab/src"],
+      "@material-ui/lab/*": ["./packages/material-ui-lab/src/*"],
+      "@material-ui/styles": ["./packages/material-ui-styles/src"],
+      "@material-ui/styles/*": ["./packages/material-ui-styles/src/*"],
+      "@material-ui/system": ["./packages/material-ui-system/src"],
+      "@material-ui/types": ["./packages/material-ui-types"],
+      "test/*": ["./test/*"]
+    }
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "**/build/"
   ],
   "include": [
     "src"
