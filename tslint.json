@@ -1,0 +1,10 @@
+{
+  "extends": [
+    "tslint-config-standard",
+    "tslint-react",
+    "tslint-react-hooks"
+  ],
+  "rules": {
+    "react-hooks-nesting": "error"
+  }
+}
