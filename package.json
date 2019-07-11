@@ -1,0 +1,20 @@
+{
+  "name": "lists",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Evgeniy <blednovea@smartguide.agency>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^16.8.23",
+    "@types/react-dom": "^16.8.4",
+    "source-map-loader": "^0.2.4",
+    "ts-loader": "^6.0.4",
+    "typescript": "^3.5.3",
+    "webpack": "^4.35.3",
+    "webpack-cli": "^3.3.5"
+  },
+  "dependencies": {
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  }
+}
