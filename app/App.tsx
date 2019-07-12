@@ -1,9 +1,9 @@
 import React from 'react'
-import { Hello } from './components/Hello'
+import Root from './Root'
 import injectSheet from './styles/reset'
 
 const App = () => (
-	<Hello compiler='TypeScript' framework='React' />
+	<Root />
 )
 
 export default injectSheet(App)

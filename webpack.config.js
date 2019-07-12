@@ -5,7 +5,7 @@ const isProd = process.env.NODE_ENV === 'production';
 const config = {
   mode: isProd ? 'production' : 'development',
   entry: {
-    index: './src/index.tsx',
+    index: './app/index.tsx',
   },
   output: {
     path: resolve(__dirname, 'dist'),
