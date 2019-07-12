@@ -1,11 +1,12 @@
 const { resolve } = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const isProd = process.env.NODE_ENV === 'production';
+const appDir = 'app'
 
 const config = {
   mode: isProd ? 'production' : 'development',
   entry: {
-    index: './app/index.tsx',
+    index: `./${appDir}/index.tsx`,
   },
   output: {
     path: resolve(__dirname, 'dist'),
@@ -36,7 +37,7 @@ const config = {
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Babel + TypeScript + React = ❤️',
-      template: 'src/index.html',
+      template: `${appDir}/index.html`,
     }),
   ]
 };
