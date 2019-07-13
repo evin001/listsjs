@@ -7,7 +7,7 @@ const ROOT_DIR = path.resolve(__dirname, 'app');
 const config = {
   mode: isProd ? 'production' : 'development',
   entry: {
-    index: `./${appDirName}/index.tsx`,
+    index: ['@babel/polyfill', `./${appDirName}/index.tsx`]
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
