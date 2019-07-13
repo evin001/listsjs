@@ -13,6 +13,10 @@
     "quotemark": [true, "single", "jsx-double"],
     "no-empty-interface": false,
     "no-implicit-dependencies": [false],
-    "no-console": false
-  }
+    "no-console": false,
+    "object-curly-spacing": [true, "always"]
+  },
+  "rulesDirectory": [
+    "node_modules/tslint-eslint-rules/dist/rules"
+  ]
 }
