@@ -1,1 +1,1 @@
-export { Book } from './domain/Book'
+export { Book } from './domain/Book';

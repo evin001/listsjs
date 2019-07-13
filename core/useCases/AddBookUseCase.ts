@@ -1,4 +1,4 @@
-import { Book } from '../domain'
+import { Book } from '../domain';
 
 export class AddBookUseCase {
 

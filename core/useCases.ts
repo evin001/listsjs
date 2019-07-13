@@ -1,1 +1,1 @@
-export { AddBookUseCase } from './useCases/AddBookUseCase'
+export { AddBookUseCase } from './useCases/AddBookUseCase';
