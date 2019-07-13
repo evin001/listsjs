@@ -1,4 +1,4 @@
-enum BaseType {
+export enum BaseType {
   Done,
   InProcess,
   Planned,
