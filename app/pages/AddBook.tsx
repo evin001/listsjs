@@ -1,4 +1,5 @@
 import DateFnsUtils from '@date-io/date-fns';
+import Box from '@material-ui/core/Box';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -11,23 +12,17 @@ import React from 'react';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    textField: {
-      display: 'block',
-    },
     formControl: {
-      margin: theme.spacing(2),
-      minWidth: 240,
+      margin: theme.spacing(2, 0, 1),
+      minWidth: 250,
     },
   }));
 
-interface ICommonProps {
-  [name: string]: any;
-}
+interface ICommonProps {}
 
 const addBook = () => {
   const classes = useStyles();
   const commonProps: ICommonProps = {
-    className: classes.textField,
     fullWidth: true,
     margin: 'normal',
   };
@@ -37,31 +32,35 @@ const addBook = () => {
 
   return (
     <form autoComplete="off">
-      <TextField label="Цель прочтения" {...commonProps} />
-      <TextField label="Автор" {...commonProps} />
-      <TextField label="Название" {...commonProps} />
-      <TextField
+      <Box><TextField label="Цель прочтения" {...commonProps} /></Box>
+      <Box><TextField label="Автор" {...commonProps} /></Box>
+      <Box><TextField label="Название" {...commonProps} /></Box>
+      <Box><TextField
         label="Описание"
         multiline={true}
         rowsMax="10"
         {...commonProps}
-      />
-      <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ruLocale}>
-        <KeyboardDatePicker
-          margin="normal"
-          label="Date picker"
-          value={new Date()}
-          onChange={handleDateChange}
-        />
-      </MuiPickersUtilsProvider>
-      <FormControl className={classes.formControl}>
-        <InputLabel htmlFor="list-type">Список</InputLabel>
-        <Select value="" inputProps={{ id: 'list-type' }}>
-          <MenuItem>Done</MenuItem>
-          <MenuItem>In the process</MenuItem>
-          <MenuItem>Planning</MenuItem>
-        </Select>
-      </FormControl>
+      /></Box>
+      <Box>
+        <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ruLocale}>
+          <KeyboardDatePicker
+            margin="normal"
+            label="Date picker"
+            value={new Date()}
+            onChange={handleDateChange}
+          />
+        </MuiPickersUtilsProvider>
+      </Box>
+      <Box>
+        <FormControl className={classes.formControl}>
+          <InputLabel htmlFor="list-type">Список</InputLabel>
+          <Select value="" inputProps={{ id: 'list-type' }}>
+            <MenuItem>Done</MenuItem>
+            <MenuItem>In the process</MenuItem>
+            <MenuItem>Planning</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
     </form>
   );
 };
