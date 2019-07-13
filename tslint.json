@@ -5,6 +5,6 @@
     "tslint-react-hooks"
   ],
   "rules": {
-    "react-hooks-nesting": "error"
+    "no-empty": false
   }
 }
