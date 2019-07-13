@@ -4,7 +4,7 @@ import AddBook from './pages/AddBook';
 
 const styles = {
   root: {
-    width: '800px',
+    width: 800,
     margin: '0 auto',
   },
 };

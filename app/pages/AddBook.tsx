@@ -14,6 +14,10 @@ const useStyles = makeStyles((theme: Theme) =>
     textField: {
       display: 'block',
     },
+    formControl: {
+      margin: theme.spacing(2),
+      minWidth: 240,
+    },
   }));
 
 interface ICommonProps {
@@ -50,9 +54,9 @@ const addBook = () => {
           onChange={handleDateChange}
         />
       </MuiPickersUtilsProvider>
-      <FormControl>
+      <FormControl className={classes.formControl}>
         <InputLabel htmlFor="list-type">Список</InputLabel>
-        <Select inputProps={{ id: 'list-type' }}>
+        <Select value="" inputProps={{ id: 'list-type' }}>
           <MenuItem>Done</MenuItem>
           <MenuItem>In the process</MenuItem>
           <MenuItem>Planning</MenuItem>
