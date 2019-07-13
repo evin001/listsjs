@@ -12,11 +12,11 @@
     "strict": true,
     "noEmit": true,
     "experimentalDecorators": true,
-    "baseUrl": "./",
     "allowSyntheticDefaultImports": true,
     "noErrorTruncation": true,
     "isolatedModules": false,
     "esModuleInterop": true,
+    "baseUrl": "./",
     "paths": {
       "@material-ui/core": ["./packages/material-ui/src"],
       "@material-ui/core/*": ["./packages/material-ui/src/*"],
@@ -26,14 +26,11 @@
       "@material-ui/styles/*": ["./packages/material-ui-styles/src/*"],
       "@material-ui/system": ["./packages/material-ui-system/src"],
       "@material-ui/types": ["./packages/material-ui-types"],
-      "test/*": ["./test/*"]
+      "test/*": ["./test/*"],
+      "lists-core/*": ["./core/*"],
+      "~/*": ["./app/*"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "**/build/"
-  ],
-  "include": [
-    "app"
-  ]
+  "exclude": ["node_modules", "**/build/"],
+  "include": ["app", "core"]
 }

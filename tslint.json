@@ -11,6 +11,8 @@
     "max-line-length": false,
     "object-literal-sort-keys": false,
     "quotemark": [true, "single", "jsx-double"],
-    "no-empty-interface": false
+    "no-empty-interface": false,
+    "no-implicit-dependencies": [false],
+    "no-console": false
   }
 }

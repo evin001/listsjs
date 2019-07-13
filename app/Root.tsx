@@ -1,6 +1,6 @@
 import { WithStyles, withStyles } from '@material-ui/styles';
 import React from 'react';
-import AddBook from './pages/AddBook';
+import AddBook from '~/pages/AddBook';
 
 const styles = {
   root: {

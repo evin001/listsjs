@@ -1,24 +1,26 @@
-const { resolve } = require('path');
+const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const isProd = process.env.NODE_ENV === 'production';
-const appDir = 'app'
+const appDirName = 'app'
+const ROOT_DIR = path.resolve(__dirname, 'app');
 
 const config = {
   mode: isProd ? 'production' : 'development',
   entry: {
-    index: `./${appDir}/index.tsx`,
+    index: `./${appDirName}/index.tsx`,
   },
   output: {
-    path: resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
   },
-  // Enable sourcemaps for debugging webpack's output.
-  devtool: "source-map",
-
+  devtool: 'source-map',
   resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.tsx']
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+	  alias: {
+      'lists-core': path.resolve(__dirname, 'core'),
+      '~': ROOT_DIR
+    }
   },
-
   module: {
     rules: [
       {
@@ -26,7 +28,6 @@ const config = {
         use: 'babel-loader',
         exclude: /node_modules/,
       },
-      // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
       {
         enforce: "pre",
         test: /\.js$/,
@@ -37,7 +38,7 @@ const config = {
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Babel + TypeScript + React = ❤️',
-      template: `${appDir}/index.html`,
+      template: `${appDirName}/index.html`,
     }),
   ]
 };
