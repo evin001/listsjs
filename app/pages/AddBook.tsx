@@ -1,5 +1,6 @@
 import DateFnsUtils from '@date-io/date-fns';
 import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -57,6 +58,10 @@ const addBook = () => {
 
   function handleChangeDate(date: Date | null) {
     setValues({ ...values, doneDate: date });
+  }
+
+  function handleClickAdd() {
+    console.log('add book');
   }
 
   return (
@@ -119,6 +124,7 @@ const addBook = () => {
           </Select>
         </FormControl>
       </Box>
+      <Button variant="contained" color="primary" onClick={handleClickAdd}>Добавить</Button>
     </form>
   );
 };
