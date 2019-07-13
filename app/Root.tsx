@@ -1,17 +1,20 @@
-import React from 'react'
-import { WithStyles, withStyles } from '@material-ui/styles'
+import { WithStyles, withStyles } from '@material-ui/styles';
+import React from 'react';
+import AddBook from './pages/AddBook';
 
 const styles = {
   root: {
     width: '800px',
-    margin: '0 auto'
-  }
-}
+    margin: '0 auto',
+  },
+};
 
-interface RootProps extends WithStyles<typeof styles> {}
+interface IRootProps extends WithStyles<typeof styles> {}
 
-const Root = ({ classes }: RootProps) => (
-	<div className={classes.root}>hello</div>
-)
+const Root = ({ classes }: IRootProps) => (
+  <div className={classes.root}>
+    <AddBook />
+  </div>
+);
 
-export default withStyles(styles)(Root)
+export default withStyles(styles)(Root);
