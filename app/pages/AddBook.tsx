@@ -100,17 +100,19 @@ const addBook = () => {
           {...commonProps}
         />
       </Box>
-      <Box>
-        <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ruLocale}>
-          <KeyboardDatePicker
-            margin="normal"
-            label="Date picker"
-            format="dd/MM/yyyy"
-            value={values.doneDate}
-            onChange={handleChangeDate}
-          />
-        </MuiPickersUtilsProvider>
-      </Box>
+      {values.type === BaseType.Done && (
+        <Box>
+          <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ruLocale}>
+            <KeyboardDatePicker
+              margin="normal"
+              label="Дата прочтения"
+              format="dd.MM.yyyy"
+              value={values.doneDate}
+              onChange={handleChangeDate}
+            />
+          </MuiPickersUtilsProvider>
+        </Box>
+      )}
       <Box>
         <FormControl className={classes.formControl}>
           <InputLabel htmlFor="list-type">Список</InputLabel>
