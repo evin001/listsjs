@@ -19,6 +19,8 @@
     "firebase": "^6.2.4",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "redux": "^4.0.4",
+    "redux-saga": "^1.0.5",
     "typeface-roboto": "^0.0.54"
   },
   "devDependencies": {
@@ -28,10 +30,10 @@
     "@babel/preset-env": "^7.5.4",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.3.3",
-    "@types/jss": "^9.5.8",
     "@types/material-ui": "^0.21.6",
     "@types/react": "^16.8.23",
     "@types/react-dom": "^16.8.4",
+    "@types/react-redux": "^7.1.1",
     "babel-loader": "^8.0.6",
     "cross-env": "^5.2.0",
     "css-loader": "^3.0.0",

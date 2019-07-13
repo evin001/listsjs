@@ -105,6 +105,7 @@ const addBook = () => {
           <KeyboardDatePicker
             margin="normal"
             label="Date picker"
+            format="dd/MM/yyyy"
             value={values.doneDate}
             onChange={handleChangeDate}
           />
