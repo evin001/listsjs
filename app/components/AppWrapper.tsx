@@ -1,21 +1,16 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import React from 'react';
 import AddBook from '~/pages/AddBook';
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  root: {
-    maxWidth: 800,
-    margin: '0 auto',
-    padding: theme.spacing(0, 2),
-  },
-}));
-
 const AppWrapper = () => {
-  const classes = useStyles();
   return (
-    <div className={classes.root}>
-      <AddBook />
-    </div>
+    <React.Fragment>
+      <CssBaseline />
+      <Container maxWidth="md">
+        <AddBook />
+      </Container>
+    </React.Fragment>
   );
 };
 
