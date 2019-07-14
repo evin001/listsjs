@@ -11,6 +11,8 @@ import { KeyboardDatePicker , MuiPickersUtilsProvider } from '@material-ui/picke
 import ruLocale from 'date-fns/locale/ru';
 import { BaseType } from 'lists-core/domain/Book';
 import React from 'react';
+import { connect } from 'react-redux';
+import { addBookAction } from '~/adapters';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -31,7 +33,11 @@ interface IState {
   type: BaseType;
 }
 
-const addBook = () => {
+interface IProps {
+  dispatchAddBook: (book: any) => void;
+}
+
+const addBook = (props: IProps) => {
   const classes = useStyles();
   const [values, setValues] = React.useState<IState>({
     readingTarget: '',
@@ -61,7 +67,7 @@ const addBook = () => {
   }
 
   function handleClickAdd() {
-    console.log('add book');
+    props.dispatchAddBook(values);
   }
 
   return (
@@ -132,4 +138,8 @@ const addBook = () => {
   );
 };
 
-export default addBook;
+const mapDispatchToProps = {
+  dispatchAddBook: addBookAction,
+};
+
+export default connect(null, mapDispatchToProps)(addBook);

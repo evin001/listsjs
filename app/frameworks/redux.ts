@@ -1,9 +1,10 @@
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { createLogger } from 'redux-logger';
 import createSagaMiddleware from 'redux-saga';
-import { rootSaga, routerReducer } from '~/adapters';
+import { bookReducer, rootSaga, routerReducer } from '~/adapters';
 
 const rootReducer = {
+  book: bookReducer,
   router: routerReducer,
 };
 
