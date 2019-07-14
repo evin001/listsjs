@@ -3,12 +3,12 @@ import { Provider } from 'react-redux';
 import 'typeface-roboto';
 import { configureStore } from '~/frameworks';
 import injectSheet from '~/styles/reset';
-import Root from './Root';
+import AppWrapper from './AppWrapper';
 
-const App = () => (
+const AppPresenter = () => (
   <Provider store={configureStore()}>
-    <Root />
+    <AppWrapper />
   </Provider>
 );
 
-export default injectSheet(App);
+export default injectSheet(AppPresenter);

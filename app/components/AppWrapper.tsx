@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   },
 }));
 
-const Root = () => {
+const AppWrapper = () => {
   const classes = useStyles();
   return (
     <div className={classes.root}>
@@ -19,4 +19,4 @@ const Root = () => {
   );
 };
 
-export default Root;
+export default AppWrapper;
