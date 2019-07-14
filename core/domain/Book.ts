@@ -10,9 +10,7 @@ export class Book {
   }
 
   set author(value: string) {
-    if (value.length <= Book.authorMaxLength) {
-      this._author = value;
-    }
+    this._author = value.substr(0, Book.authorMaxLength);
   }
 
   get isErrorAuthor() {
@@ -24,9 +22,7 @@ export class Book {
   }
 
   set description(value: string) {
-    if (value.length <= Book.descriptionMaxLength) {
-      this._description = value;
-    }
+    this._description = value.substr(0, Book.descriptionMaxLength);
   }
 
   get isErrorDescription(): boolean {
@@ -38,9 +34,7 @@ export class Book {
   }
 
   set name(value: string) {
-    if (value.length <= Book.nameMaxLength) {
-      this._name = value;
-    }
+    this._name = value.substr(0, Book.nameMaxLength);
   }
 
   get isErrorName(): boolean {
@@ -52,9 +46,7 @@ export class Book {
   }
 
   set readingTarget(value: string) {
-    if (value.length <= Book.readingTargetMaxLength) {
-      this._readingTarget = value;
-    }
+    this._readingTarget = value.substr(0, Book.readingTargetMaxLength);
   }
 
   public static authorMaxLength = 100;
