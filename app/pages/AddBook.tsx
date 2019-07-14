@@ -73,35 +73,42 @@ const addBook = (props: IProps) => {
           label="Цель прочтения"
           value={values.readingTarget}
           onChange={handleChangeInput('readingTarget')}
+          helperText={`${values.readingTarget && values.readingTarget.length || 0}/${Book.readingTargetMaxLength}`}
           {...commonProps}
         />
       </Box>
       <Box>
         <TextField
           required
+          error={values.isErrorAuthor}
           label="Автор"
           value={values.author}
           onChange={handleChangeInput('author')}
+          helperText={`${values.author && values.author.length || 0}/${Book.authorMaxLength}`}
           {...commonProps}
         />
       </Box>
       <Box>
         <TextField
           required
+          error={values.isErrorName}
           label="Название"
           value={values.name}
           onChange={handleChangeInput('name')}
+          helperText={`${values.name && values.name.length || 0}/${Book.nameMaxLength}`}
           {...commonProps}
         />
       </Box>
       <Box>
         <TextField
           required
+          error={values.isErrorDescription}
           label="Описание"
           value={values.description}
           onChange={handleChangeInput('description')}
           multiline={true}
           rowsMax="10"
+          helperText={`${values.description && values.description.length || 0}/${Book.descriptionMaxLength}`}
           {...commonProps}
         />
       </Box>

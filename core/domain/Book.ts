@@ -6,7 +6,7 @@ export enum BaseType {
 
 export class Book {
   get author(): string {
-    return this._author;
+    return this._author || '';
   }
 
   set author(value: string) {
@@ -15,8 +15,12 @@ export class Book {
     }
   }
 
+  get isErrorAuthor() {
+    return this._author === '';
+  }
+
   get description(): string {
-    return this._description;
+    return this._description || '';
   }
 
   set description(value: string) {
@@ -25,14 +29,22 @@ export class Book {
     }
   }
 
+  get isErrorDescription(): boolean {
+    return this._description === '';
+  }
+
   get name(): string {
-    return this._name;
+    return this._name || '';
   }
 
   set name(value: string) {
     if (value.length <= Book.nameMaxLength) {
       this._name = value;
     }
+  }
+
+  get isErrorName(): boolean {
+    return this._name === '';
   }
 
   get readingTarget(): string {
@@ -45,31 +57,32 @@ export class Book {
     }
   }
 
+  public static authorMaxLength = 100;
+  public static nameMaxLength = 100;
+  public static readingTargetMaxLength = 250;
+  public static descriptionMaxLength = 1000;
+
   public static clone(book: Book): Book {
     const clone = new Book();
 
     clone.cover = book.cover;
-    clone.description = book.description;
     clone.doneDate = book.doneDate;
-    clone.name = book.name;
     clone.readingTarget = book.readingTarget;
     clone.type = book.type;
-    clone.author = book.author;
+
+    clone._author = book._author;
+    clone._description = book._description;
+    clone._name = book._name;
 
     return clone;
   }
-
-  private static authorMaxLength = 100;
-  private static nameMaxLength = 100;
-  private static readingTargetMaxLength = 250;
-  private static descriptionMaxLength = 1000;
 
   public cover?: string;
   public doneDate?: Date | null;
   public type: BaseType = BaseType.Planned;
 
-  private _author: string = '';
-  private _description: string = '';
-  private _name: string = '';
+  private _author: string | undefined = undefined;
+  private _description: string | undefined = undefined;
+  private _name: string | undefined = undefined;
   private _readingTarget: string = '';
 }
