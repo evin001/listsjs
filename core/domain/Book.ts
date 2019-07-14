@@ -58,6 +58,12 @@ export class Book {
     this._readingTarget = value.substr(0, Book.readingTargetMaxLength);
   }
 
+  get isDisabled(): boolean {
+    return this.isErrorAuthor || !this._author ||
+      this.isErrorName || !this._name ||
+      this.isErrorDescription || !this._description;
+  }
+
   public static authorMaxLength = 100;
   public static nameMaxLength = 100;
   public static readingTargetMaxLength = 250;

@@ -143,7 +143,14 @@ const addBook = (props: IProps) => {
           </Select>
         </FormControl>
       </Box>
-      <Button variant="contained" color="primary" onClick={handleClickAdd}>Добавить</Button>
+      <Button
+        disabled={values.isDisabled}
+        variant="contained"
+        color="primary"
+        onClick={handleClickAdd}
+      >
+        Добавить
+      </Button>
     </form>
   );
 };
