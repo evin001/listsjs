@@ -1,3 +1,4 @@
+import { Book } from 'lists-core/domain/Book';
 import { AddBookInteractor } from 'lists-core/useCases/AddBookInteractor';
 import { all, call, put, takeEvery } from 'redux-saga/effects';
 import { BookProvider } from '~/providers';
@@ -23,7 +24,7 @@ interface IAddBookActionType {
 }
 
 // Actions Creators
-export function addBookAction(book: any): IAddBookActionType {
+export function addBookAction(book: Book): IAddBookActionType {
   return {
     type: ADD_BOOK_REQUEST,
     payload: book,

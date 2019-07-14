@@ -1,7 +1,7 @@
 export enum BaseType {
-  Done,
-  InProcess,
-  Planned,
+  Done = 'done',
+  InProcess = 'in-process',
+  Planned = 'planned',
 }
 
 export class Book {

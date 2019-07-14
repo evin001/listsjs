@@ -35,7 +35,7 @@ interface IState {
 }
 
 interface IProps {
-  dispatchAddBook: (book: any) => void;
+  dispatchAddBook: (book: Book) => void;
 }
 
 const addBook = (props: IProps) => {

@@ -1,6 +1,6 @@
 import firebase from 'firebase/app';
 import { IBookProvider } from 'lists-core/boundaries/IBookProvider';
-import { Book } from 'lists-core/domain/Book';
+import { BaseType, Book } from 'lists-core/domain/Book';
 import { AppStoreProvider } from './AppStoreProvider';
 
 export class BookProvider implements IBookProvider {
@@ -9,6 +9,14 @@ export class BookProvider implements IBookProvider {
     (AppStoreProvider.getInstance().getStore() as firebase.firestore.Firestore);
 
   public addBook(book: Book): Promise<any> {
-    return this.store.collection(BookProvider.collection).add(book);
+    return this.store.collection(BookProvider.collection).add({
+      author: book.author,
+      name: book.name,
+      description: book.description,
+      type: book.type,
+      ...(book.readingTarget !== undefined ? { readingTarget: book.readingTarget } : {}),
+      ...(book.cover !== undefined ? { cover: book.cover } : {}),
+      ...(book.doneDate !== undefined ? { doneDate: book.doneDate } : {}),
+    });
   }
 }
