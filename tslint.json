@@ -15,7 +15,8 @@
     "no-implicit-dependencies": [false],
     "no-console": false,
     "object-curly-spacing": [true, "always"],
-    "jsx-no-multiline-js": false
+    "jsx-no-multiline-js": false,
+    "jsx-boolean-value": false
   },
   "rulesDirectory": [
     "node_modules/tslint-eslint-rules/dist/rules"
