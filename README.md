@@ -1,0 +1,1 @@
+Application based on TypeScript for storing lists in the social network vk
