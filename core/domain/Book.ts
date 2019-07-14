@@ -5,6 +5,15 @@ export enum BaseType {
 }
 
 export class Book {
+  get type(): BaseType {
+    return this._type;
+  }
+
+  set type(value: BaseType) {
+    this.doneDate = (value !== BaseType.Done) ? null : new Date();
+    this._type = value;
+  }
+
   get author(): string {
     return this._author || '';
   }
@@ -71,10 +80,10 @@ export class Book {
 
   public cover?: string;
   public doneDate?: Date | null;
-  public type: BaseType = BaseType.Planned;
 
   private _author: string | undefined = undefined;
   private _description: string | undefined = undefined;
   private _name: string | undefined = undefined;
   private _readingTarget: string = '';
+  private _type: BaseType = BaseType.Planned;
 }
