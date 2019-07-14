@@ -9,6 +9,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { KeyboardDatePicker , MuiPickersUtilsProvider } from '@material-ui/pickers';
 import ruLocale from 'date-fns/locale/ru';
+import { Book } from 'lists-core/domain';
 import { BaseType } from 'lists-core/domain/Book';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -39,14 +40,7 @@ interface IProps {
 
 const addBook = (props: IProps) => {
   const classes = useStyles();
-  const [values, setValues] = React.useState<IState>({
-    readingTarget: '',
-    author: '',
-    name: '',
-    description: '',
-    doneDate: new Date(),
-    type: BaseType.Planned,
-  });
+  const [values, setValues] = React.useState<Book>(new Book());
   const commonProps: ICommonProps = {
     fullWidth: true,
     margin: 'normal',
@@ -54,16 +48,18 @@ const addBook = (props: IProps) => {
 
   function handleChangeInput(name: keyof IState) {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
-      setValues({ ...values, [name]: event.target.value });
+      const cloneBook = Book.clone(values);
+      (cloneBook[name] as string) = event.target.value;
+      setValues(cloneBook);
     };
   }
 
   function handleChangeSelect(event: React.ChangeEvent<{ name?: string, value: unknown }>) {
-    setValues({ ...values, [event.target.name as string]: event.target.value });
+    // setValues({ ...values, [event.target.name as string]: event.target.value });
   }
 
   function handleChangeDate(date: Date | null) {
-    setValues({ ...values, doneDate: date });
+    // setValues({ ...values, doneDate: date });
   }
 
   function handleClickAdd() {
@@ -82,6 +78,7 @@ const addBook = (props: IProps) => {
       </Box>
       <Box>
         <TextField
+          required
           label="Автор"
           value={values.author}
           onChange={handleChangeInput('author')}
@@ -90,6 +87,7 @@ const addBook = (props: IProps) => {
       </Box>
       <Box>
         <TextField
+          required
           label="Название"
           value={values.name}
           onChange={handleChangeInput('name')}
@@ -98,6 +96,7 @@ const addBook = (props: IProps) => {
       </Box>
       <Box>
         <TextField
+          required
           label="Описание"
           value={values.description}
           onChange={handleChangeInput('description')}
