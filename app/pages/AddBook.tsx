@@ -55,11 +55,15 @@ const addBook = (props: IProps) => {
   }
 
   function handleChangeSelect(event: React.ChangeEvent<{ name?: string, value: unknown }>) {
-    // setValues({ ...values, [event.target.name as string]: event.target.value });
+    const cloneBook = Book.clone(values);
+    cloneBook.type = event.target.value as BaseType;
+    setValues(cloneBook);
   }
 
   function handleChangeDate(date: Date | null) {
-    // setValues({ ...values, doneDate: date });
+    const cloneBook = Book.clone(values);
+    cloneBook.doneDate = date;
+    setValues(cloneBook);
   }
 
   function handleClickAdd() {
