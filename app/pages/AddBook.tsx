@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     formControl: {
       margin: theme.spacing(2, 0, 1),
-      minWidth: 250,
+      minWidth: 238,
     },
   }));
 
@@ -144,7 +144,7 @@ const addBook = (props: IProps) => {
         </FormControl>
       </Box>
       <Button
-        disabled={values.isDisabled}
+        disabled={values.isError}
         variant="contained"
         color="primary"
         onClick={handleClickAdd}
