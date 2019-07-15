@@ -1,4 +1,4 @@
-import { Book } from 'lists-core/domain/Book';
+import { IBook } from 'lists-core/domain/Book';
 import { AddBookInteractor } from 'lists-core/useCases/AddBookInteractor';
 import { ListBookInteractor } from 'lists-core/useCases/ListBookInteractor';
 import { all, call, put, takeEvery } from 'redux-saga/effects';
@@ -16,15 +16,36 @@ export const LIST_BOOK_REQUEST = `${appName}/${moduleName}/LIST_BOOK_REQUEST`;
 export const LIST_BOOK_SUCCESS = `${appName}/${moduleName}/LIST_BOOK_SUCCESS`;
 export const LIST_BOOK_ERROR = `${appName}/${moduleName}/LIST_BOOK_ERROR`;
 
-export const bookReducer = (state: any = {}, action: any) => {
+export interface IBookState {
+  readonly books: Map<string, IBook> | null;
+}
+
+export const initialBookState = {
+  books: null,
+};
+
+export interface IBookAction {
+  type: string;
+  payload: any;
+}
+
+export const bookReducer = (state: IBookState = initialBookState, action: IBookAction) => {
   switch (action.type) {
+    case LIST_BOOK_SUCCESS:
+      return {
+        ...state,
+        books: action.payload,
+      };
     default:
       return state;
   }
 };
 
+// Selectors
+export const booksSelector = (state: IBookState) => state.books;
+
 // Actions Creators
-export function addBookAction(book: Book) {
+export function addBookAction(book: IBook) {
   return {
     type: ADD_BOOK_REQUEST,
     payload: book,
@@ -51,7 +72,7 @@ export function listBookAction() {
   };
 }
 
-export function listBookSuccessAction(books: any) {
+export function listBookSuccessAction(books: Map<string, IBook> | null) {
   return {
     type: LIST_BOOK_SUCCESS,
     payload: books,

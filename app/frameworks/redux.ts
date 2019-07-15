@@ -1,7 +1,11 @@
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { createLogger } from 'redux-logger';
 import createSagaMiddleware from 'redux-saga';
-import { bookReducer, rootSaga, routerReducer } from '~/adapters';
+import { bookReducer, IBookState, rootSaga, routerReducer } from '~/adapters';
+
+export interface IStateType {
+  book: IBookState;
+}
 
 const rootReducer = {
   book: bookReducer,

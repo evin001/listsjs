@@ -9,7 +9,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { KeyboardDatePicker , MuiPickersUtilsProvider } from '@material-ui/pickers';
 import ruLocale from 'date-fns/locale/ru';
-import { Book } from 'lists-core/domain';
+import { Book, IBook } from 'lists-core/domain';
 import { BaseType } from 'lists-core/domain/Book';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -35,7 +35,7 @@ interface IState {
 }
 
 interface IProps {
-  dispatchAddBook: (book: Book) => void;
+  dispatchAddBook: (book: IBook) => void;
 }
 
 const addBook = (props: IProps) => {
