@@ -1,7 +1,7 @@
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import React from 'react';
-import AddBook from '~/pages/AddBook';
+import ListBook from '~/pages/ListBook';
 import Header from './Header';
 
 const AppWrapper = () => {
@@ -10,7 +10,7 @@ const AppWrapper = () => {
       <CssBaseline />
       <Container maxWidth="md">
         <Header />
-        <AddBook />
+        <ListBook />
       </Container>
     </React.Fragment>
   );

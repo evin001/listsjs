@@ -4,7 +4,17 @@ export enum BaseType {
   Planned = 'planned',
 }
 
-export class Book {
+export interface IBook {
+   cover?: string;
+   doneDate?: Date | null;
+   author: string | undefined;
+   description: string | undefined;
+   name: string | undefined;
+   readingTarget: string;
+   type: BaseType;
+}
+
+export class Book implements IBook {
   get type(): BaseType {
     return this._type;
   }
