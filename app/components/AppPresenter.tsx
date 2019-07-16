@@ -1,6 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import 'typeface-roboto';
+import '~/assets/fonts/stylesheet.css';
 import { configureStore } from '~/frameworks';
 import injectSheet from '~/styles/reset';
 import AppWrapper from './AppWrapper';
