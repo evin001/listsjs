@@ -32,7 +32,7 @@ class ListBook extends PureComponent<IProps> {
               <Grid item xs={4} key={key}>
                 <Card>
                   <CardContent>
-                    <Typography variant="h5" component="h2">{value.name}</Typography>
+                    <Typography variant="h6" component="h2">{value.name}</Typography>
                     <Typography color="textSecondary">{value.author}</Typography>
                     <Typography variant="body2" component="p">{value.description}</Typography>
                   </CardContent>
