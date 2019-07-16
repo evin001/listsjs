@@ -12,9 +12,14 @@ export interface IBook {
    name: string | undefined;
    readingTarget: string;
    type: BaseType;
+   shortDescription: string;
 }
 
 export class Book implements IBook {
+  get shortDescription(): string {
+    return this.description.substr(0, Book.shortDescriptionLength) + '...';
+  }
+
   get type(): BaseType {
     return this._type;
   }
@@ -79,6 +84,7 @@ export class Book implements IBook {
   public static nameMaxLength = 100;
   public static readingTargetMaxLength = 250;
   public static descriptionMaxLength = 1000;
+  public static shortDescriptionLength = 100;
 
   public static clone(book: Book): Book {
     const clone = new Book();

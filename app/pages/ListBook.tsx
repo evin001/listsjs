@@ -34,7 +34,7 @@ class ListBook extends PureComponent<IProps> {
                   <CardContent>
                     <Typography variant="h6" component="h2">{value.name}</Typography>
                     <Typography color="textSecondary">{value.author}</Typography>
-                    <Typography variant="body2" component="p">{value.description}</Typography>
+                    <Typography variant="body2" component="p">{value.shortDescription}</Typography>
                   </CardContent>
                   <CardActions>
                     <Button size="small">Подробнее</Button>
