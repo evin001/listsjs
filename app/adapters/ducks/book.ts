@@ -1,3 +1,4 @@
+import { OrderedMap } from 'immutable';
 import { IBook } from 'lists-core/domain/Book';
 import { AddBookInteractor } from 'lists-core/useCases/AddBookInteractor';
 import { ListBookInteractor } from 'lists-core/useCases/ListBookInteractor';
@@ -17,7 +18,7 @@ export const LIST_BOOK_SUCCESS = `${appName}/${moduleName}/LIST_BOOK_SUCCESS`;
 export const LIST_BOOK_ERROR = `${appName}/${moduleName}/LIST_BOOK_ERROR`;
 
 export interface IBookState {
-  readonly books: Map<string, IBook> | null;
+  readonly books: OrderedMap<string, IBook> | null;
 }
 
 export const initialBookState = {

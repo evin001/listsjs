@@ -1,4 +1,5 @@
 import firebase from 'firebase/app';
+import { OrderedMap } from 'immutable';
 import { IBookProvider } from 'lists-core/boundaries/IBookProvider';
 import { Book, IBook } from 'lists-core/domain';
 import { AppStoreProvider } from './AppStoreProvider';
@@ -20,11 +21,11 @@ export class BookProvider implements IBookProvider {
     });
   }
 
-  public async listBook(): Promise<Map<string, IBook> | null> {
+  public async listBook(): Promise<OrderedMap<string, IBook> | null> {
     const books: firebase.firestore.QuerySnapshot =
       await this.store.collection(BookProvider.collection).get();
 
-    const collections: Map<string, IBook> = new Map();
+    let collections: OrderedMap<string, IBook> = OrderedMap();
 
     books.forEach((doc) => {
       const data = doc.data();
@@ -40,7 +41,7 @@ export class BookProvider implements IBookProvider {
         book.doneDate = data.doneDate.toDate();
       }
 
-      collections.set(doc.id, book);
+      collections = collections.set(doc.id, book);
     });
 
     return collections;

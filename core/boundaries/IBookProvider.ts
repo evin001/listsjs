@@ -1,6 +1,6 @@
-import { Book, IBook } from '../domain';
+import { Book } from '../domain';
 
 export interface IBookProvider {
   addBook(book: Book): Promise<any>;
-  listBook(): Promise<Map<string, IBook> | null>;
+  listBook(): Promise<any>;
 }
