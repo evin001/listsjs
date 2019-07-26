@@ -21,9 +21,14 @@ export class BookProvider implements IBookProvider {
     });
   }
 
-  public async listBook(): Promise<OrderedMap<string, IBook> | null> {
-    const books: firebase.firestore.QuerySnapshot =
-      await this.store.collection(BookProvider.collection).get();
+  public async listBook(cursor: firebase.firestore.QueryDocumentSnapshot | null, limit: number = 2):
+    Promise<[OrderedMap<string, IBook> | null, any]> {
+
+    let request = this.store.collection(BookProvider.collection).limit(limit);
+    if (cursor) {
+      request = request.startAfter(cursor);
+    }
+    const books: firebase.firestore.QuerySnapshot = await request.get();
 
     let collections: OrderedMap<string, IBook> = OrderedMap();
 
@@ -44,6 +49,8 @@ export class BookProvider implements IBookProvider {
       collections = collections.set(doc.id, book);
     });
 
-    return collections;
+    const last = books.docs[books.docs.length - 1] || null;
+
+    return [collections, last];
   }
 }
