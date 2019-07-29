@@ -18,6 +18,7 @@ export const ADD_BOOK_ERROR = `${appName}/${moduleName}/ADD_BOOK_ERROR`;
 export const LIST_BOOK_REQUEST = `${appName}/${moduleName}/LIST_BOOK_REQUEST`;
 export const LIST_BOOK_SUCCESS = `${appName}/${moduleName}/LIST_BOOK_SUCCESS`;
 export const LIST_BOOK_ERROR = `${appName}/${moduleName}/LIST_BOOK_ERROR`;
+export const LIST_BOOK_LOADING = `${appName}/${moduleName}/LIST_BOOK_LOADING`;
 
 export type BooksType = Map<number, OrderedMap<string, IBook>>;
 
@@ -25,6 +26,7 @@ export interface IListBook {
   lastDoc: firebase.firestore.QueryDocumentSnapshot | null;
   books: BooksType;
   done: boolean;
+  isLoading: boolean;
 }
 
 export interface IBookState extends IListBook {}
@@ -33,6 +35,7 @@ export const initialBookState: IBookState = {
   lastDoc: null,
   books: Map(),
   done: false,
+  isLoading: false,
 };
 
 export interface IBookAction {
@@ -42,13 +45,22 @@ export interface IBookAction {
 
 export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBookState, action) => {
   switch (action.type) {
-    case LIST_BOOK_SUCCESS:
+    case LIST_BOOK_LOADING:
       return {
         ...state,
-        lastDoc: action.payload.lastDoc,
-        books: state.books.setIn([state.books.size], action.payload.books),
-        done: action.payload.lastDoc === null,
+        isLoading: true,
       };
+    case LIST_BOOK_SUCCESS: {
+      return {
+        ...state,
+        done: action.payload.lastDoc === null,
+        lastDoc: action.payload.lastDoc,
+        ...(action.payload.books.size > 0 ? {
+          books: state.books.setIn([state.books.size], action.payload.books),
+        } : {}),
+        isLoading: false,
+      };
+    }
     default:
       return state;
   }
@@ -80,10 +92,9 @@ export function addBookErrorAction(error: any) {
   };
 }
 
-export function listBookAction(page: number) {
+export function listBookAction() {
   return {
     type: LIST_BOOK_REQUEST,
-    payload: page,
   };
 }
 
@@ -94,6 +105,12 @@ export function listBookSuccessAction(books: Map<string, IBook> | null, lastDoc:
       books,
       lastDoc,
     },
+  };
+}
+
+export function listBookLoadingAction() {
+  return {
+    type: LIST_BOOK_LOADING,
   };
 }
 
@@ -119,6 +136,7 @@ function* addBookSaga(action: any) {
 
 function* listBookSaga() {
   try {
+    yield put(listBookLoadingAction());
     const provider = new BookProvider();
     const interactor = new ListBookInteractor(provider);
     const state: IBookState = yield select(rootSelector);
