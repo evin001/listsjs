@@ -25,7 +25,8 @@
     "react-router-dom": "^5.0.1",
     "react-router-redux": "^4.0.8",
     "redux": "^4.0.4",
-    "redux-saga": "^1.0.5"
+    "redux-saga": "^1.0.5",
+    "xstate": "^4.6.7"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
