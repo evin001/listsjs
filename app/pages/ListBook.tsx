@@ -40,41 +40,35 @@ interface IPageStateSchema {
 
 interface IPageContext {
   page: number;
-  count: number;
 }
 
 type PageEvent =
   | { type: 'INC' }
   | { type: 'DEC' }
-  | { type: 'COUNT' };
+  | { type: 'OFFSET' };
 
 const increment = (context: IPageContext) => context.page + 1;
 const decrement = (context: IPageContext) => context.page - 1;
-const selectCount = (context: IPageContext) => context.count;
 const offsetPage = (context: IPageContext, event: any) => event.value - 1;
-const setCount = (context: IPageContext, event: any) => event.value;
 const isNotMin = (context: IPageContext) => context.page >= 0;
-const isNotMax = (context: IPageContext) => context.count !== -1 ? context.page < context.count : true;
 
 const pageMachine = Machine<IPageContext, IPageStateSchema, PageEvent>({
   initial: 'active',
   context: {
     page: 0,
-    count: -1,
   },
   states: {
     active: {
       on: {
         INC: {
-          actions: assign({ page: increment, count: selectCount }),
-          cond: isNotMax,
+          actions: assign({ page: increment }),
         },
         DEC: {
-          actions: assign({ page: decrement, count: selectCount }),
+          actions: assign({ page: decrement }),
           cond: isNotMin,
         },
-        COUNT: {
-          actions: assign({ page: offsetPage, count: setCount }),
+        OFFSET: {
+          actions: assign({ page: offsetPage }),
         },
       },
     },
@@ -113,8 +107,8 @@ class ListBook extends PureComponent<IProps, IState> {
   public componentDidUpdate() {
     const { done, books } = this.props;
     const { current } = this.state;
-    if (done && books.size === current.context.page && current.context.count === -1) {
-      this.service.send('COUNT', { value: books.size });
+    if (done && books.size === current.context.page) {
+      this.service.send('OFFSET', { value: books.size });
     }
   }
 
