@@ -10,7 +10,7 @@ import TextField from '@material-ui/core/TextField';
 import { KeyboardDatePicker , MuiPickersUtilsProvider } from '@material-ui/pickers';
 import ruLocale from 'date-fns/locale/ru';
 import { Book, IBook } from 'lists-core/domain';
-import { BaseType } from 'lists-core/domain/Book';
+import { BaseType, baseTypeList } from 'lists-core/domain/Book';
 import React from 'react';
 import { connect } from 'react-redux';
 import { addBookAction } from '~/adapters';
@@ -137,9 +137,9 @@ const addBook = (props: IProps) => {
             inputProps={{ id: 'list-type', name: 'type' }}
             onChange={handleChangeSelect}
           >
-            <MenuItem value={BaseType.Done}>Прочитано</MenuItem>
-            <MenuItem value={BaseType.InProcess}>Читаю</MenuItem>
-            <MenuItem value={BaseType.Planned}>Запланировано</MenuItem>
+            {baseTypeList.map((data) => (
+              <MenuItem key={data.key} value={data.key}>{data.label}</MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Box>

@@ -4,6 +4,17 @@ export enum BaseType {
   Planned = 'planned',
 }
 
+export interface IBaseTypeList {
+  key: BaseType;
+  label: string;
+}
+
+export const baseTypeList: IBaseTypeList[] = [
+  { key: BaseType.Done, label: 'Прочитанные' },
+  { key: BaseType.InProcess, label: 'Читаю' },
+  { key: BaseType.Planned, label: 'Запланированные' },
+];
+
 export interface IBook {
    cover?: string;
    doneDate?: Date | null;

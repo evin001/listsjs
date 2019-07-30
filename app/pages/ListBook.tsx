@@ -14,6 +14,7 @@ import React, { Fragment, PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { assign, interpret, Machine, State } from 'xstate';
 import { bookListSelector, BooksType, listBookAction } from '~/adapters';
+import BookFilters from '~/components/BookFilters';
 import { IStateType } from '~/frameworks';
 
 interface IMapStateToProps {
@@ -82,11 +83,15 @@ const styles = (theme: Theme) => createStyles({
   pagination: {
     display: 'flex',
     justifyContent: 'flex-end',
-    marginBottom: theme.spacing(1),
   },
   progress: {
     position: 'absolute',
     width: '100%',
+  },
+  control: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });
 
@@ -131,21 +136,24 @@ class ListBook extends PureComponent<IProps, IState> {
           </Box>
         )}
         <Box my={1}>
-          <Box className={classes.pagination}>
-            <IconButton
-              className={classes.button}
-              onClick={this.handleClickBeforePage}
-              disabled={page === 0}
-            >
-              <NavigateBefore />
-            </IconButton>
-            <IconButton
-              onClick={this.handleClickNextPage}
-              disabled={done && page + 1 === books.size}
-            >
-              <NavigateNext />
-            </IconButton>
-          </Box>
+          <div className={classes.control}>
+            <BookFilters />
+            <Box className={classes.pagination}>
+              <IconButton
+                className={classes.button}
+                onClick={this.handleClickBeforePage}
+                disabled={page === 0}
+              >
+                <NavigateBefore />
+              </IconButton>
+              <IconButton
+                onClick={this.handleClickNextPage}
+                disabled={done && page + 1 === books.size}
+              >
+                <NavigateNext />
+              </IconButton>
+            </Box>
+          </div>
 
           {!isLoading && (
             <Grid container spacing={2}>
