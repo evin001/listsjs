@@ -10,10 +10,76 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import Typography from '@material-ui/core/Typography';
 import NavigateBefore from '@material-ui/icons/NavigateBefore';
 import NavigateNext from '@material-ui/icons/NavigateNext';
-import React, { PureComponent } from 'react';
+import React, { Fragment, PureComponent } from 'react';
 import { connect } from 'react-redux';
+import { assign, interpret, Machine, State } from 'xstate';
 import { bookListSelector, BooksType, listBookAction } from '~/adapters';
 import { IStateType } from '~/frameworks';
+
+interface IMapStateToProps {
+  done: boolean;
+  isLoading: boolean;
+  books: BooksType;
+}
+
+interface IMapDispatchToProps {
+  dispatchListBook: () => void;
+}
+
+interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IMapDispatchToProps {}
+
+interface IState {
+  current: State<IPageContext, PageEvent>;
+}
+
+interface IPageStateSchema {
+  states: {
+    active: {};
+  };
+}
+
+interface IPageContext {
+  page: number;
+  count: number;
+}
+
+type PageEvent =
+  | { type: 'INC' }
+  | { type: 'DEC' }
+  | { type: 'COUNT' };
+
+const increment = (context: IPageContext) => context.page + 1;
+const decrement = (context: IPageContext) => context.page - 1;
+const selectCount = (context: IPageContext) => context.count;
+const offsetPage = (context: IPageContext, event: any) => event.value - 1;
+const setCount = (context: IPageContext, event: any) => event.value;
+const isNotMin = (context: IPageContext) => context.page >= 0;
+const isNotMax = (context: IPageContext) => context.count !== -1 ? context.page < context.count : true;
+
+const pageMachine = Machine<IPageContext, IPageStateSchema, PageEvent>({
+  initial: 'active',
+  context: {
+    page: 0,
+    count: -1,
+  },
+  states: {
+    active: {
+      on: {
+        INC: {
+          actions: assign({ page: increment, count: selectCount }),
+          cond: isNotMax,
+        },
+        DEC: {
+          actions: assign({ page: decrement, count: selectCount }),
+          cond: isNotMin,
+        },
+        COUNT: {
+          actions: assign({ page: offsetPage, count: setCount }),
+        },
+      },
+    },
+  },
+});
 
 const styles = (theme: Theme) => createStyles({
   button: {
@@ -29,68 +95,62 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
-interface IMapStateToProps {
-  done: boolean;
-  isLoading: boolean;
-  books: BooksType;
-}
-
-interface IMapDispatchToProps {
-  dispatchListBook: () => void;
-}
-
-interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IMapDispatchToProps {}
-
-interface IState {
-  page: number;
-}
-
 class ListBook extends PureComponent<IProps, IState> {
 
-  public static getDerivedStateFromProps(props: IProps, state: IState) {
-    if (props.done && state.page === props.books.size) {
-      return {
-        page: props.books.size - 1,
-      };
-    }
-    return null;
-  }
-
   public state = {
-    page: 0,
+    current: pageMachine.initialState,
   };
 
+  public service = interpret(pageMachine).onTransition((current) => {
+    this.setState({ current });
+  });
+
   public componentDidMount() {
+    this.service.start();
     this.props.dispatchListBook();
+  }
+
+  public componentDidUpdate() {
+    const { done, books } = this.props;
+    const { current } = this.state;
+    if (done && books.size === current.context.page && current.context.count === -1) {
+      this.service.send('COUNT', { value: books.size });
+    }
+  }
+
+  public componentWillUnmount() {
+    this.service.stop();
   }
 
   public render() {
     const { books, done, isLoading, classes } = this.props;
-    const { page } = this.state;
+    const { current } = this.state;
+    const { page } = current.context;
     const listBooks = books.get(page);
 
     return (
-      <Box my={1}>
-        <Box className={classes.pagination}>
-          <IconButton
-            className={classes.button}
-            onClick={this.handleClickBeforePage}
-            disabled={page === 0}
-          >
-            <NavigateBefore />
-          </IconButton>
-          <IconButton
-            onClick={this.handleClickNextPage}
-            disabled={done && page + 1 === books.size}
-          >
-            <NavigateNext />
-          </IconButton>
-        </Box>
+      <Fragment>
+        {isLoading && <LinearProgress color="secondary" />}
+        <Box my={1}>
+          <Box className={classes.pagination}>
+            <IconButton
+              className={classes.button}
+              onClick={this.handleClickBeforePage}
+              disabled={page === 0}
+            >
+              <NavigateBefore />
+            </IconButton>
+            <IconButton
+              onClick={this.handleClickNextPage}
+              disabled={done && page + 1 === books.size}
+            >
+              <NavigateNext />
+            </IconButton>
+          </Box>
 
-        {!isLoading ? (
-          <Grid container spacing={2}>
-            {
-              listBooks && listBooks.map(((value, key) => (
+          {!isLoading && (
+            <Grid container spacing={2}>
+              {listBooks && listBooks.map(((value, key) => (
                 <Grid item xs={4} key={key}>
                   <Card>
                     <CardContent>
@@ -103,30 +163,25 @@ class ListBook extends PureComponent<IProps, IState> {
                     </CardActions>
                   </Card>
                 </Grid>
-              ))).valueSeq().toArray()
-            }
-          </Grid>
-        ) : (
-          <LinearProgress color="secondary" />
-        )}
-      </Box>
+              ))).valueSeq().toArray()}
+            </Grid>
+          )}
+        </Box>
+      </Fragment>
     );
   }
 
   private handleClickBeforePage = () => {
-    const { page } = this.state;
-    if (page > 0) {
-      this.setState({ page: page - 1 });
-    }
+    this.service.send('DEC');
   }
 
   private handleClickNextPage = () => {
     const { books, done } = this.props;
-    const page = this.state.page + 1;
-    if (!(done || books.get(page))) {
+    const { current } = this.state;
+    if (!(done || books.get(current.context.page + 1))) {
       this.props.dispatchListBook();
     }
-    this.setState({ page });
+    this.service.send('INC');
   }
 }
 
