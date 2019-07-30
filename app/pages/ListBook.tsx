@@ -85,7 +85,8 @@ const styles = (theme: Theme) => createStyles({
     marginBottom: theme.spacing(1),
   },
   progress: {
-    margin: theme.spacing(2),
+    position: 'absolute',
+    width: '100%',
   },
 });
 
@@ -124,7 +125,11 @@ class ListBook extends PureComponent<IProps, IState> {
 
     return (
       <Fragment>
-        {isLoading && <LinearProgress color="secondary" />}
+        {(isLoading) && (
+          <Box position="relative">
+            <LinearProgress color="secondary" className={classes.progress} />
+          </Box>
+        )}
         <Box my={1}>
           <Box className={classes.pagination}>
             <IconButton
