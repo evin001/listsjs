@@ -71,7 +71,6 @@ export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBoo
         lastDoc: null,
         books: Map(),
         done: false,
-        isLoading: false,
         filterType: action.payload,
       };
     default:
@@ -163,8 +162,8 @@ function* listBookSaga(action: any) {
     const interactor = new ListBookInteractor(provider);
 
     let state: IBookState = yield select(rootSelector);
-    console.log(1, state.filterType, payload);
-    if (state.filterType !== payload) {
+
+    if ((state.filterType || payload) && state.filterType !== payload) {
       yield put(listBookResetAction(payload));
       state = yield select(rootSelector);
     }

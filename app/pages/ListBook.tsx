@@ -49,11 +49,13 @@ type PageEvent =
   | { type: 'INC' }
   | { type: 'DEC' }
   | { type: 'OFFSET' }
+  | { type: 'RESET' }
   | { type: 'FILTER'; value: FilterType, callback: any };
 
 const increment = (context: IPageContext) => context.page + 1;
 const decrement = (context: IPageContext) => context.page - 1;
 const offsetPage = (context: IPageContext, event: any) => event.value - 1;
+const resetPage = () => 0;
 const isNotMin = (context: IPageContext) => context.page >= 0;
 const selectType = (context: IPageContext) => context.type;
 const selectPage = (context: IPageContext) => context.page;
@@ -78,6 +80,9 @@ const pageMachine = Machine<IPageContext, IPageStateSchema, PageEvent>({
         DEC: {
           actions: assign({ page: decrement, type: selectType }),
           cond: isNotMin,
+        },
+        RESET: {
+          actions: assign({ page: resetPage, type: selectType }),
         },
         OFFSET: {
           actions: assign({ page: offsetPage, type: selectType }),
@@ -194,10 +199,12 @@ class ListBook extends PureComponent<IProps, IState> {
   }
 
   private handleChangeType = (value: BaseType) => {
-    this.service.send('FILTER', { value, callback: (type: FilterType) => {
-        this.props.dispatchListBook(type);
-      },
-    });
+    this.service.send([
+      'RESET',
+      { type: 'FILTER', value, callback: (type: FilterType) => {
+          this.props.dispatchListBook(type);
+        } },
+    ]);
   }
 
   private handleClickBeforePage = () => {
