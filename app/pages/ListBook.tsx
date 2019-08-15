@@ -14,7 +14,7 @@ import { BaseType } from 'lists-core/domain/Book';
 import React, { Fragment, PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { assign, EventObject, interpret, Machine, State } from 'xstate';
-import { bookListSelector, BooksType, listBookAction } from '~/adapters';
+import { bookListSelector, BooksType, FilterType, listBookAction } from '~/adapters';
 import BookFilters from '~/components/BookFilters';
 import { IStateType } from '~/frameworks';
 
@@ -25,7 +25,7 @@ interface IMapStateToProps {
 }
 
 interface IMapDispatchToProps {
-  dispatchListBook: (type?: BaseType | null) => void;
+  dispatchListBook: (type?: FilterType) => void;
 }
 
 interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IMapDispatchToProps {}
@@ -42,14 +42,14 @@ interface IPageStateSchema {
 
 interface IPageContext {
   page: number;
-  type: BaseType | null;
+  type: FilterType;
 }
 
 type PageEvent =
   | { type: 'INC' }
   | { type: 'DEC' }
   | { type: 'OFFSET' }
-  | { type: 'FILTER'; value: BaseType | null };
+  | { type: 'FILTER'; value: FilterType, callback: any };
 
 const increment = (context: IPageContext) => context.page + 1;
 const decrement = (context: IPageContext) => context.page - 1;
@@ -57,8 +57,11 @@ const offsetPage = (context: IPageContext, event: any) => event.value - 1;
 const isNotMin = (context: IPageContext) => context.page >= 0;
 const selectType = (context: IPageContext) => context.type;
 const selectPage = (context: IPageContext) => context.page;
-const updateType = (context: IPageContext, event: EventObject) =>
-  context.type === event.value ? null : event.value;
+const updateType = (context: IPageContext, event: EventObject) => {
+  const type = context.type === event.value ? null : event.value;
+  event.callback(type);
+  return type;
+};
 
 const pageMachine = Machine<IPageContext, IPageStateSchema, PageEvent>({
   initial: 'active',
@@ -191,7 +194,10 @@ class ListBook extends PureComponent<IProps, IState> {
   }
 
   private handleChangeType = (value: BaseType) => {
-    this.service.send('FILTER', { value });
+    this.service.send('FILTER', { value, callback: (type: FilterType) => {
+        this.props.dispatchListBook(type);
+      },
+    });
   }
 
   private handleClickBeforePage = () => {

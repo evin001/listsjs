@@ -19,6 +19,7 @@ export const LIST_BOOK_REQUEST = `${appName}/${moduleName}/LIST_BOOK_REQUEST`;
 export const LIST_BOOK_SUCCESS = `${appName}/${moduleName}/LIST_BOOK_SUCCESS`;
 export const LIST_BOOK_ERROR = `${appName}/${moduleName}/LIST_BOOK_ERROR`;
 export const LIST_BOOK_LOADING = `${appName}/${moduleName}/LIST_BOOK_LOADING`;
+export const LIST_BOOK_RESET = `${appName}/${moduleName}/LIST_BOOK_RESET`;
 
 export type BooksType = Map<number, OrderedMap<string, IBook>>;
 
@@ -27,7 +28,7 @@ export interface IListBook {
   books: BooksType;
   done: boolean;
   isLoading: boolean;
-  filterType?: BaseType;
+  filterType?: FilterType;
 }
 
 export interface IBookState extends IListBook {}
@@ -39,9 +40,11 @@ export const initialBookState: IBookState = {
   isLoading: false,
 };
 
+export type FilterType  = BaseType | null;
+
 export interface IBookAction {
   type: string;
-  payload: IListBook;
+  payload: IListBook & FilterType;
 }
 
 export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBookState, action) => {
@@ -62,6 +65,15 @@ export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBoo
         isLoading: false,
       };
     }
+    case LIST_BOOK_RESET:
+      return {
+        ...state,
+        lastDoc: null,
+        books: Map(),
+        done: false,
+        isLoading: false,
+        filterType: action.payload,
+      };
     default:
       return state;
   }
@@ -93,7 +105,7 @@ export function addBookErrorAction(error: any) {
   };
 }
 
-export function listBookAction(filter?: BaseType | null) {
+export function listBookAction(filter?: FilterType) {
   return {
     type: LIST_BOOK_REQUEST,
     payload: filter,
@@ -123,6 +135,13 @@ export function listBookErrorAction(error: any) {
   };
 }
 
+export function listBookResetAction(type: FilterType) {
+  return {
+    type: LIST_BOOK_RESET,
+    payload: type,
+  };
+}
+
 // Sagas
 function* addBookSaga(action: any) {
   const { payload } = action;
@@ -142,9 +161,19 @@ function* listBookSaga(action: any) {
     yield put(listBookLoadingAction());
     const provider = new BookProvider();
     const interactor = new ListBookInteractor(provider);
-    const state: IBookState = yield select(rootSelector);
+
+    let state: IBookState = yield select(rootSelector);
+    console.log(1, state.filterType, payload);
+    if (state.filterType !== payload) {
+      yield put(listBookResetAction(payload));
+      state = yield select(rootSelector);
+    }
+
     const lastDocFromState = state.lastDoc;
-    const [books, lastDoc] = yield call([interactor, interactor.listBook], lastDocFromState, payload);
+    const [books, lastDoc] = yield call(
+      [interactor, interactor.listBook],
+      lastDocFromState, payload,
+    );
     yield put(listBookSuccessAction(books, lastDoc));
   } catch (error) {
     yield put(listBookErrorAction(error));

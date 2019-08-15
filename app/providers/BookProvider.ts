@@ -29,9 +29,8 @@ export class BookProvider implements IBookProvider {
   ): Promise<[OrderedMap<string, IBook> | null, any]> {
 
     let request = this.store.collection(BookProvider.collection).limit(limit);
-    if (cursor) {
-      request = request.startAfter(cursor);
-    }
+    if (type) { request = request.where('type', '==', type); }
+    if (cursor) { request = request.startAfter(cursor); }
     const books: firebase.firestore.QuerySnapshot = await request.get();
 
     let collections: OrderedMap<string, IBook> = OrderedMap();
