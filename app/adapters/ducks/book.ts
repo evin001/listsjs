@@ -1,6 +1,6 @@
 import firebase from 'firebase/app';
 import { Map, OrderedMap } from 'immutable';
-import { IBook } from 'lists-core/domain/Book';
+import { BaseType, IBook } from 'lists-core/domain/Book';
 import { AddBookInteractor } from 'lists-core/useCases/AddBookInteractor';
 import { ListBookInteractor } from 'lists-core/useCases/ListBookInteractor';
 import { Reducer } from 'redux';
@@ -27,6 +27,7 @@ export interface IListBook {
   books: BooksType;
   done: boolean;
   isLoading: boolean;
+  filterType?: BaseType;
 }
 
 export interface IBookState extends IListBook {}
@@ -92,9 +93,10 @@ export function addBookErrorAction(error: any) {
   };
 }
 
-export function listBookAction() {
+export function listBookAction(filter?: BaseType | null) {
   return {
     type: LIST_BOOK_REQUEST,
+    payload: filter,
   };
 }
 
@@ -134,14 +136,15 @@ function* addBookSaga(action: any) {
   }
 }
 
-function* listBookSaga() {
+function* listBookSaga(action: any) {
+  const { payload } = action;
   try {
     yield put(listBookLoadingAction());
     const provider = new BookProvider();
     const interactor = new ListBookInteractor(provider);
     const state: IBookState = yield select(rootSelector);
     const lastDocFromState = state.lastDoc;
-    const [books, lastDoc] = yield call([interactor, interactor.listBook], lastDocFromState);
+    const [books, lastDoc] = yield call([interactor, interactor.listBook], lastDocFromState, payload);
     yield put(listBookSuccessAction(books, lastDoc));
   } catch (error) {
     yield put(listBookErrorAction(error));

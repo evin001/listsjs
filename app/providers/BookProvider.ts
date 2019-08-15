@@ -2,6 +2,7 @@ import firebase from 'firebase/app';
 import { OrderedMap } from 'immutable';
 import { IBookProvider } from 'lists-core/boundaries/IBookProvider';
 import { Book, IBook } from 'lists-core/domain';
+import { BaseType } from 'lists-core/domain/Book';
 import { AppStoreProvider } from './AppStoreProvider';
 
 export class BookProvider implements IBookProvider {
@@ -21,8 +22,11 @@ export class BookProvider implements IBookProvider {
     });
   }
 
-  public async listBook(cursor: firebase.firestore.QueryDocumentSnapshot | null, limit: number = 2):
-    Promise<[OrderedMap<string, IBook> | null, any]> {
+  public async listBook(
+    cursor: firebase.firestore.QueryDocumentSnapshot | null,
+    type?: BaseType,
+    limit: number = 2,
+  ): Promise<[OrderedMap<string, IBook> | null, any]> {
 
     let request = this.store.collection(BookProvider.collection).limit(limit);
     if (cursor) {

@@ -10,9 +10,10 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import Typography from '@material-ui/core/Typography';
 import NavigateBefore from '@material-ui/icons/NavigateBefore';
 import NavigateNext from '@material-ui/icons/NavigateNext';
+import { BaseType } from 'lists-core/domain/Book';
 import React, { Fragment, PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { assign, interpret, Machine, State } from 'xstate';
+import { assign, EventObject, interpret, Machine, State } from 'xstate';
 import { bookListSelector, BooksType, listBookAction } from '~/adapters';
 import BookFilters from '~/components/BookFilters';
 import { IStateType } from '~/frameworks';
@@ -24,7 +25,7 @@ interface IMapStateToProps {
 }
 
 interface IMapDispatchToProps {
-  dispatchListBook: () => void;
+  dispatchListBook: (type?: BaseType | null) => void;
 }
 
 interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IMapDispatchToProps {}
@@ -41,35 +42,45 @@ interface IPageStateSchema {
 
 interface IPageContext {
   page: number;
+  type: BaseType | null;
 }
 
 type PageEvent =
   | { type: 'INC' }
   | { type: 'DEC' }
-  | { type: 'OFFSET' };
+  | { type: 'OFFSET' }
+  | { type: 'FILTER'; value: BaseType | null };
 
 const increment = (context: IPageContext) => context.page + 1;
 const decrement = (context: IPageContext) => context.page - 1;
 const offsetPage = (context: IPageContext, event: any) => event.value - 1;
 const isNotMin = (context: IPageContext) => context.page >= 0;
+const selectType = (context: IPageContext) => context.type;
+const selectPage = (context: IPageContext) => context.page;
+const updateType = (context: IPageContext, event: EventObject) =>
+  context.type === event.value ? null : event.value;
 
 const pageMachine = Machine<IPageContext, IPageStateSchema, PageEvent>({
   initial: 'active',
   context: {
     page: 0,
+    type: null,
   },
   states: {
     active: {
       on: {
         INC: {
-          actions: assign({ page: increment }),
+          actions: assign({ page: increment, type: selectType }),
         },
         DEC: {
-          actions: assign({ page: decrement }),
+          actions: assign({ page: decrement, type: selectType }),
           cond: isNotMin,
         },
         OFFSET: {
-          actions: assign({ page: offsetPage }),
+          actions: assign({ page: offsetPage, type: selectType }),
+        },
+        FILTER: {
+          actions: assign({ page: selectPage, type: updateType }),
         },
       },
     },
@@ -99,6 +110,7 @@ class ListBook extends PureComponent<IProps, IState> {
 
   public state = {
     current: pageMachine.initialState,
+    filterType: null,
   };
 
   public service = interpret(pageMachine).onTransition((current) => {
@@ -125,7 +137,7 @@ class ListBook extends PureComponent<IProps, IState> {
   public render() {
     const { books, done, isLoading, classes } = this.props;
     const { current } = this.state;
-    const { page } = current.context;
+    const { page, type } = current.context;
     const listBooks = books.get(page);
 
     return (
@@ -137,7 +149,7 @@ class ListBook extends PureComponent<IProps, IState> {
         )}
         <Box my={1}>
           <div className={classes.control}>
-            <BookFilters />
+            <BookFilters type={type} onChangeType={this.handleChangeType} />
             <Box className={classes.pagination}>
               <IconButton
                 className={classes.button}
@@ -178,6 +190,10 @@ class ListBook extends PureComponent<IProps, IState> {
     );
   }
 
+  private handleChangeType = (value: BaseType) => {
+    this.service.send('FILTER', { value });
+  }
+
   private handleClickBeforePage = () => {
     this.service.send('DEC');
   }
@@ -186,7 +202,7 @@ class ListBook extends PureComponent<IProps, IState> {
     const { books, done } = this.props;
     const { current } = this.state;
     if (!(done || books.get(current.context.page + 1))) {
-      this.props.dispatchListBook();
+      this.props.dispatchListBook(current.context.type);
     }
     this.service.send('INC');
   }
