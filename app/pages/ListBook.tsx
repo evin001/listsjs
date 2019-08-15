@@ -13,6 +13,7 @@ import NavigateNext from '@material-ui/icons/NavigateNext';
 import { BaseType } from 'lists-core/domain/Book';
 import React, { Fragment, PureComponent } from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { assign, EventObject, interpret, Machine, State } from 'xstate';
 import { bookListSelector, BooksType, FilterType, listBookAction } from '~/adapters';
 import BookFilters from '~/components/BookFilters';
@@ -186,7 +187,7 @@ class ListBook extends PureComponent<IProps, IState> {
                       <Typography variant="body2" component="p">{value.shortDescription}</Typography>
                     </CardContent>
                     <CardActions>
-                      <Button size="small">Подробнее</Button>
+                      <Button size="small" component={Link} to={`/add-book/${key}`}>Подробнее</Button>
                     </CardActions>
                   </Card>
                 </Grid>
