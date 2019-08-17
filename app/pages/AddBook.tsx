@@ -13,7 +13,7 @@ import { Book } from 'lists-core/domain';
 import { BaseType, baseTypeList } from 'lists-core/domain/Book';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { addBookAction, AddBookType, bookSelector, getBookById, GetBookByIdType } from '~/adapters';
+import { bookActions, bookSelector, IBookActions } from '~/adapters';
 import { IStateType } from '~/frameworks';
 
 interface ICommonProps {}
@@ -31,12 +31,7 @@ interface IMapStateToProps {
   book?: Book;
 }
 
-interface IMapDispatchToProps {
-  dispatchAddBook: AddBookType;
-  dispatchGetBookId: GetBookByIdType;
-}
-
-interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IMapDispatchToProps {
+interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActions {
   match: {
     params: {
       id?: string,
@@ -64,9 +59,9 @@ class AddBook extends PureComponent<IProps, IState> {
   };
 
   public componentDidMount() {
-    const { match, dispatchGetBookId } = this.props;
+    const { match, get } = this.props;
     if (match.params.id) {
-      dispatchGetBookId(match.params.id);
+      get(match.params.id);
     }
   }
 
@@ -195,8 +190,8 @@ class AddBook extends PureComponent<IProps, IState> {
   }
 
   private handleClickAdd = () => {
-    const { dispatchAddBook, match } = this.props;
-    dispatchAddBook(this.state.values, match.params.id);
+    const { add, match } = this.props;
+    add(this.state.values, match.params.id);
   }
 }
 
@@ -204,9 +199,4 @@ const mapStateToProps = (state: IStateType): IMapStateToProps => ({
   book: bookSelector(state.book),
 });
 
-const mapDispatchToProps: IMapDispatchToProps = {
-  dispatchAddBook: addBookAction,
-  dispatchGetBookId: getBookById,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(AddBook));
+export default connect(mapStateToProps, bookActions)(withStyles(styles)(AddBook));

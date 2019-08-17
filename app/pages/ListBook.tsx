@@ -14,7 +14,7 @@ import React, { Fragment, PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { assign, EventObject, interpret, Machine, State } from 'xstate';
-import { bookListSelector, BooksType, FilterType, listBookAction } from '~/adapters';
+import { bookActions, bookListSelector, BooksType, FilterType, IBookActions } from '~/adapters';
 import BookFilters from '~/components/BookFilters';
 import { IStateType } from '~/frameworks';
 
@@ -24,11 +24,7 @@ interface IMapStateToProps {
   books: BooksType;
 }
 
-interface IMapDispatchToProps {
-  dispatchListBook: (type?: FilterType) => void;
-}
-
-interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IMapDispatchToProps {}
+interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActions {}
 
 interface IState {
   current: State<IPageContext, PageEvent>;
@@ -123,7 +119,7 @@ class ListBook extends PureComponent<IProps, IState> {
 
   public componentDidMount() {
     this.service.start();
-    this.props.dispatchListBook();
+    this.props.list();
   }
 
   public componentDidUpdate() {
@@ -193,7 +189,7 @@ class ListBook extends PureComponent<IProps, IState> {
     this.service.send([
       'RESET',
       { type: 'FILTER', value, callback: (type: FilterType) => {
-          this.props.dispatchListBook(type);
+          this.props.list(type);
         } },
     ]);
   }
@@ -206,7 +202,7 @@ class ListBook extends PureComponent<IProps, IState> {
     const { books, done } = this.props;
     const { current } = this.state;
     if (!(done || books.get(current.context.page + 1))) {
-      this.props.dispatchListBook(current.context.type);
+      this.props.list(current.context.type);
     }
     this.service.send('INC');
   }
@@ -218,8 +214,4 @@ const mapStateToProps = (state: IStateType): IMapStateToProps => ({
   isLoading: state.book.isLoading,
 });
 
-const mapDispatchToProps: IMapDispatchToProps = {
-  dispatchListBook: listBookAction,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(ListBook));
+export default connect(mapStateToProps, bookActions)(withStyles(styles)(ListBook));
