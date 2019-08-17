@@ -3,10 +3,11 @@ import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import React from 'react';
 import { HashRouter as Router, Route } from 'react-router-dom';
-import Loader from '~/components/Loader';
 import AddBookPage from '~/pages/AddBook';
 import ListBookPage from '~/pages/ListBook';
 import Header from './Header';
+import Loader from './Loader';
+import Notification from './Notification';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   root: {
@@ -22,6 +23,7 @@ const AppWrapper = () => {
       <Container maxWidth="md" classes={{ root: classes.root }}>
         <Header />
         <Loader />
+        <Notification />
         <Route exact path="/" component={ListBookPage} />
         <Route path="/add-book/:id" component={AddBookPage} />
         <Route exact path="/add-book" component={AddBookPage} />

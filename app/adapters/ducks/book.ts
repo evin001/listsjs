@@ -6,9 +6,8 @@ import { ListBookInteractor } from 'lists-core/useCases/ListBookInteractor';
 import { Reducer } from 'redux';
 import { all, call, put, select, takeEvery } from 'redux-saga/effects';
 import { BookProvider } from '~/providers';
-
-export const appName = 'lists';
-export const moduleName = 'book';
+import { appName, moduleName } from './constants';
+import { NotificationType, showNotificationAction } from './notification';
 
 // Actions
 export const ADD_BOOK_REQUEST = `${appName}/${moduleName}/ADD_BOOK_REQUEST`;
@@ -52,6 +51,7 @@ export interface IBookAction {
   payload: IListBook & FilterType & Book;
 }
 
+// Reducer
 export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBookState, action) => {
   switch (action.type) {
     case BOOK_LOADING:
@@ -183,8 +183,16 @@ function* addBookSaga(action: any) {
     const interactor = new AddBookInteractor(provider);
     yield call([interactor, interactor.addBook], payload.book, payload.id);
     yield put(bookLoadedAction());
+    yield put(showNotificationAction(
+      payload.id ? 'Книга обновлена' : 'Книга добавлена',
+      NotificationType.Success,
+    ));
   } catch (error) {
     yield put(bookErrorAction(error));
+    yield put(showNotificationAction(
+      payload.id ? 'Не удалось обновить книгу' : 'Не удалось добавить книгу',
+      NotificationType.Error,
+    ));
   }
 }
 
