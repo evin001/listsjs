@@ -47,16 +47,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface IProps extends IMapDispatchToProps {
+interface IProps extends INotificationActions {
   message?: string;
   type?: NotificationType;
 }
 
-interface IMapDispatchToProps {
-  dispatchNotificationActions: INotificationActions;
-}
-
-const Notification = ({ message, type, dispatchNotificationActions }: IProps) => {
+const Notification = ({ message, type, reset }: IProps) => {
   const classes = useStyles();
   const Icon = type && variantIcon[type];
 
@@ -64,7 +60,7 @@ const Notification = ({ message, type, dispatchNotificationActions }: IProps) =>
     if (reason === 'clickaway') {
       return;
     }
-    dispatchNotificationActions.reset();
+    reset();
   }
 
   return (
@@ -101,8 +97,4 @@ const mapStateToProps = (state: IStateType) => ({
   type: state.notification.type,
 });
 
-const mapDispatchToProps: IMapDispatchToProps = {
-  dispatchNotificationActions: notificationActions,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Notification);
+export default connect(mapStateToProps, notificationActions)(Notification);
