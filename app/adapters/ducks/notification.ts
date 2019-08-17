@@ -1,5 +1,5 @@
 import { Reducer } from 'redux';
-import { appName, moduleName } from './constants';
+import { appName, moduleName } from '../constants';
 
 export enum NotificationType {
   Success = 'success',
@@ -11,14 +11,9 @@ export interface INotificationState {
   type?: NotificationType;
 }
 
-export interface IShowNotification {
-  message: string;
-  type: NotificationType;
-}
-
 export interface INotificationAction {
   type: string;
-  payload: IShowNotification;
+  payload: any;
 }
 
 // Actions
@@ -26,7 +21,8 @@ export const SHOW_NOTIFICATION = `${appName}/${moduleName}/SHOW_NOTIFICATION`;
 export const RESET_NOTIFICATION = `${appName}/${moduleName}/RESET_NOTIFICATION`;
 
 const initialState: INotificationState = {
-  message: '',
+  message: undefined,
+  type: undefined,
 };
 
 // Reducer
@@ -35,13 +31,14 @@ export const notificationReducer: Reducer<INotificationState, INotificationActio
     switch (action.type) {
       case SHOW_NOTIFICATION:
         return {
+          ...state,
           message: action.payload.message,
           type: action.payload.type,
         };
       case RESET_NOTIFICATION:
         return {
-          message: undefined,
-          type: undefined,
+          ...state,
+          ...initialState,
         };
       default:
         return state;
@@ -49,15 +46,25 @@ export const notificationReducer: Reducer<INotificationState, INotificationActio
   };
 
 // Actions Creators
-export function showNotificationAction(message: string, type: NotificationType) {
+function show(message: string, type: NotificationType) {
   return {
     type: SHOW_NOTIFICATION,
     payload: { message, type },
   };
 }
 
-export function resetNotificationAction() {
+function reset() {
   return {
     type: RESET_NOTIFICATION,
   };
 }
+
+export interface INotificationActions {
+  show: typeof show;
+  reset: typeof reset;
+}
+
+export const notificationActions: INotificationActions = {
+  show,
+  reset,
+};

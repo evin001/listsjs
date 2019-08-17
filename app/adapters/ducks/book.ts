@@ -6,12 +6,11 @@ import { ListBookInteractor } from 'lists-core/useCases/ListBookInteractor';
 import { Reducer } from 'redux';
 import { all, call, put, select, takeEvery } from 'redux-saga/effects';
 import { BookProvider } from '~/providers';
-import { appName, moduleName } from './constants';
-import { NotificationType, showNotificationAction } from './notification';
+import { appName, moduleName } from '../constants';
+import { notificationActions, NotificationType } from './notification';
 
 // Actions
 export const ADD_BOOK_REQUEST = `${appName}/${moduleName}/ADD_BOOK_REQUEST`;
-export const ADD_BOOK_SUCCESS = `${appName}/${moduleName}/ADD_BOOK_SUCCESS`;
 
 export const LIST_BOOK_REQUEST = `${appName}/${moduleName}/LIST_BOOK_REQUEST`;
 export const LIST_BOOK_SUCCESS = `${appName}/${moduleName}/LIST_BOOK_SUCCESS`;
@@ -110,13 +109,6 @@ export function addBookAction(book: IBook, id?: string) {
   };
 }
 
-export function addBookSuccessAction(book: any) {
-  return {
-    type: ADD_BOOK_SUCCESS,
-    payload: book,
-  };
-}
-
 export function listBookAction(filter?: FilterType) {
   return {
     type: LIST_BOOK_REQUEST,
@@ -183,13 +175,13 @@ function* addBookSaga(action: any) {
     const interactor = new AddBookInteractor(provider);
     yield call([interactor, interactor.addBook], payload.book, payload.id);
     yield put(bookLoadedAction());
-    yield put(showNotificationAction(
+    yield put(notificationActions.show(
       payload.id ? 'Книга обновлена' : 'Книга добавлена',
       NotificationType.Success,
     ));
   } catch (error) {
     yield put(bookErrorAction(error));
-    yield put(showNotificationAction(
+    yield put(notificationActions.show(
       payload.id ? 'Не удалось обновить книгу' : 'Не удалось добавить книгу',
       NotificationType.Error,
     ));

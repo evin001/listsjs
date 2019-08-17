@@ -11,8 +11,7 @@ import WarningIcon from '@material-ui/icons/Warning';
 import clsx from 'clsx';
 import React from 'react';
 import { connect } from 'react-redux';
-import { resetNotificationAction } from '~/adapters';
-import { NotificationType } from '~/adapters/ducks/notification';
+import { INotificationActions, notificationActions, NotificationType } from '~/adapters';
 import { IStateType } from '~/frameworks';
 
 const variantIcon = {
@@ -54,10 +53,10 @@ interface IProps extends IMapDispatchToProps {
 }
 
 interface IMapDispatchToProps {
-  dispatchResetNotification: () => void;
+  dispatchNotificationActions: INotificationActions;
 }
 
-const Notification = ({ message, type, dispatchResetNotification }: IProps) => {
+const Notification = ({ message, type, dispatchNotificationActions }: IProps) => {
   const classes = useStyles();
   const Icon = type && variantIcon[type];
 
@@ -65,7 +64,7 @@ const Notification = ({ message, type, dispatchResetNotification }: IProps) => {
     if (reason === 'clickaway') {
       return;
     }
-    dispatchResetNotification();
+    dispatchNotificationActions.reset();
   }
 
   return (
@@ -103,7 +102,7 @@ const mapStateToProps = (state: IStateType) => ({
 });
 
 const mapDispatchToProps: IMapDispatchToProps = {
-  dispatchResetNotification: resetNotificationAction,
+  dispatchNotificationActions: notificationActions,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Notification);
