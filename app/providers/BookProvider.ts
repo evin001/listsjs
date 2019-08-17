@@ -22,11 +22,8 @@ export class BookProvider implements IBookProvider {
     return book;
   }
 
-  private store: firebase.firestore.Firestore =
-    (AppStoreProvider.getInstance().getStore() as firebase.firestore.Firestore);
-
-  public addBook(book: Book): Promise<any> {
-    return this.store.collection(BookProvider.collection).add({
+  private static bookToDoc(book: Book) {
+    return {
       author: book.author,
       name: book.name,
       description: book.description,
@@ -34,7 +31,18 @@ export class BookProvider implements IBookProvider {
       ...(book.readingTarget !== undefined ? { readingTarget: book.readingTarget } : {}),
       ...(book.cover !== undefined ? { cover: book.cover } : {}),
       ...(book.doneDate !== undefined ? { doneDate: book.doneDate } : {}),
-    });
+    };
+  }
+
+  private store: firebase.firestore.Firestore =
+    (AppStoreProvider.getInstance().getStore() as firebase.firestore.Firestore);
+
+  public addBook(book: Book, id?: string): Promise<any> {
+    const collection = this.store.collection(BookProvider.collection);
+    if (id) {
+      return collection.doc(id).update(BookProvider.bookToDoc(book));
+    }
+    return collection.add(BookProvider.bookToDoc(book));
   }
 
   public async listBook(

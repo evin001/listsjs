@@ -4,6 +4,7 @@ import Menu, { MenuProps } from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Toolbar from '@material-ui/core/Toolbar';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const StyledMenu = (props: MenuProps) => (
   <Menu
@@ -35,16 +36,14 @@ const Header = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Button onClick={handleClick}>Книги</Button>
+        <Button onClick={handleClick}>Списки</Button>
         <StyledMenu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={handleClose}
           keepMounted
         >
-          <MenuItem onClick={handleClose}>Прочитанные</MenuItem>
-          <MenuItem onClick={handleClose}>Читаю</MenuItem>
-          <MenuItem onClick={handleClose}>Запланированные</MenuItem>
+          <MenuItem onClick={handleClose} component={Link} to="/">Книги</MenuItem>
         </StyledMenu>
       </Toolbar>
     </AppBar>

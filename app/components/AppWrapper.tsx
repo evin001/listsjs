@@ -1,3 +1,4 @@
+import { createStyles, makeStyles, Theme } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import React from 'react';
@@ -7,11 +8,18 @@ import AddBookPage from '~/pages/AddBook';
 import ListBookPage from '~/pages/ListBook';
 import Header from './Header';
 
+const useStyles = makeStyles((theme: Theme) => createStyles({
+  root: {
+    paddingBottom: theme.spacing(3),
+  },
+}));
+
 const AppWrapper = () => {
+  const classes = useStyles();
   return (
     <Router>
       <CssBaseline />
-      <Container maxWidth="md">
+      <Container maxWidth="md" classes={{ root: classes.root }}>
         <Header />
         <Loader />
         <Route exact path="/" component={ListBookPage} />

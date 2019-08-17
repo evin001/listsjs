@@ -9,11 +9,11 @@ import { createStyles, Theme, WithStyles, withStyles } from '@material-ui/core/s
 import TextField from '@material-ui/core/TextField';
 import { KeyboardDatePicker , MuiPickersUtilsProvider } from '@material-ui/pickers';
 import ruLocale from 'date-fns/locale/ru';
-import { Book, IBook } from 'lists-core/domain';
+import { Book } from 'lists-core/domain';
 import { BaseType, baseTypeList } from 'lists-core/domain/Book';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { addBookAction, bookSelector, getBookById } from '~/adapters';
+import { addBookAction, AddBookType, bookSelector, getBookById, GetBookByIdType } from '~/adapters';
 import { IStateType } from '~/frameworks';
 
 interface ICommonProps {}
@@ -32,8 +32,8 @@ interface IMapStateToProps {
 }
 
 interface IMapDispatchToProps {
-  dispatchAddBook: (book: IBook) => void;
-  dispatchGetBookId: (id: string) => void;
+  dispatchAddBook: AddBookType;
+  dispatchGetBookId: GetBookByIdType;
 }
 
 interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IMapDispatchToProps {
@@ -82,7 +82,7 @@ class AddBook extends PureComponent<IProps, IState> {
   }
 
   public render() {
-    const { classes } = this.props;
+    const { classes, match } = this.props;
     const { values } = this.state;
     const commonProps: ICommonProps = {
       fullWidth: true,
@@ -168,7 +168,7 @@ class AddBook extends PureComponent<IProps, IState> {
           color="primary"
           onClick={this.handleClickAdd}
         >
-          Добавить
+          {match.params.id ? 'Обновить' : 'Добавить'}
         </Button>
       </form>
     );
@@ -195,7 +195,8 @@ class AddBook extends PureComponent<IProps, IState> {
   }
 
   private handleClickAdd = () => {
-    this.props.dispatchAddBook(this.state.values);
+    const { dispatchAddBook, match } = this.props;
+    dispatchAddBook(this.state.values, match.params.id);
   }
 }
 

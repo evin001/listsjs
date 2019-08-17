@@ -13,7 +13,6 @@ export const moduleName = 'book';
 // Actions
 export const ADD_BOOK_REQUEST = `${appName}/${moduleName}/ADD_BOOK_REQUEST`;
 export const ADD_BOOK_SUCCESS = `${appName}/${moduleName}/ADD_BOOK_SUCCESS`;
-export const ADD_BOOK_ERROR = `${appName}/${moduleName}/ADD_BOOK_ERROR`;
 
 export const LIST_BOOK_REQUEST = `${appName}/${moduleName}/LIST_BOOK_REQUEST`;
 export const LIST_BOOK_SUCCESS = `${appName}/${moduleName}/LIST_BOOK_SUCCESS`;
@@ -99,11 +98,15 @@ export const bookListSelector = (state: IBookState) => state.books;
 export const bookSelector = (state: IBookState) => state.book;
 export const isLoadingSelector = (state: IBookState) => state.isLoading;
 
+// Types
+export type AddBookType = (book: IBook, id?: string) => void;
+export type GetBookByIdType = (id: string) => void;
+
 // Actions Creators
-export function addBookAction(book: IBook) {
+export function addBookAction(book: IBook, id?: string) {
   return {
     type: ADD_BOOK_REQUEST,
-    payload: book,
+    payload: { book, id },
   };
 }
 
@@ -111,13 +114,6 @@ export function addBookSuccessAction(book: any) {
   return {
     type: ADD_BOOK_SUCCESS,
     payload: book,
-  };
-}
-
-export function addBookErrorAction(error: any) {
-  return {
-    type: ADD_BOOK_ERROR,
-    error,
   };
 }
 
@@ -182,12 +178,13 @@ export function getBookByIdSuccess(book: IBook) {
 function* addBookSaga(action: any) {
   const { payload } = action;
   try {
+    yield put(bookLoadingAction());
     const provider = new BookProvider();
     const interactor = new AddBookInteractor(provider);
-    const book = yield call([interactor, interactor.addBook], payload);
-    yield put(addBookSuccessAction(book));
+    yield call([interactor, interactor.addBook], payload.book, payload.id);
+    yield put(bookLoadedAction());
   } catch (error) {
-    yield put(addBookErrorAction(error));
+    yield put(bookErrorAction(error));
   }
 }
 
