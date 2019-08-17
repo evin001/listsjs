@@ -1,6 +1,6 @@
 import firebase from 'firebase/app';
 import { Map, OrderedMap } from 'immutable';
-import { BaseType, IBook } from 'lists-core/domain/Book';
+import { BaseType, Book, IBook } from 'lists-core/domain/Book';
 import { AddBookInteractor } from 'lists-core/useCases/AddBookInteractor';
 import { ListBookInteractor } from 'lists-core/useCases/ListBookInteractor';
 import { Reducer } from 'redux';
@@ -34,7 +34,7 @@ export interface IListBook {
   done: boolean;
   isLoading: boolean;
   filterType?: FilterType;
-  book?: IBook;
+  book?: Book;
 }
 
 export interface IBookState extends IListBook {}
@@ -50,7 +50,7 @@ export type FilterType  = BaseType | null;
 
 export interface IBookAction {
   type: string;
-  payload: IListBook & FilterType & IBook;
+  payload: IListBook & FilterType & Book;
 }
 
 export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBookState, action) => {
@@ -96,6 +96,7 @@ export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBoo
 // Selectors
 export const rootSelector = (state: any) => state.book;
 export const bookListSelector = (state: IBookState) => state.books;
+export const bookSelector = (state: IBookState) => state.book;
 
 // Actions Creators
 export function addBookAction(book: IBook) {

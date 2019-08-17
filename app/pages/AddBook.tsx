@@ -13,7 +13,8 @@ import { Book, IBook } from 'lists-core/domain';
 import { BaseType, baseTypeList } from 'lists-core/domain/Book';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { addBookAction, getBookById } from '~/adapters';
+import { addBookAction, bookSelector, getBookById } from '~/adapters';
+import { IStateType } from '~/frameworks';
 
 interface ICommonProps {}
 
@@ -26,12 +27,16 @@ interface IBookState {
   type: BaseType;
 }
 
+interface IMapStateToProps {
+  book?: Book;
+}
+
 interface IMapDispatchToProps {
   dispatchAddBook: (book: IBook) => void;
   dispatchGetBookId: (id: string) => void;
 }
 
-interface IProps extends WithStyles<typeof styles>, IMapDispatchToProps {
+interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IMapDispatchToProps {
   match: {
     params: {
       id?: string,
@@ -41,6 +46,7 @@ interface IProps extends WithStyles<typeof styles>, IMapDispatchToProps {
 
 interface IState {
   values: Book;
+  isUpdateFromProps: boolean;
 }
 
 const styles = (theme: Theme) => createStyles({
@@ -54,12 +60,24 @@ class AddBook extends PureComponent<IProps, IState> {
 
   public state = {
     values: new Book(),
+    isUpdateFromProps: false,
   };
 
   public componentDidMount() {
     const { match, dispatchGetBookId } = this.props;
     if (match.params.id) {
       dispatchGetBookId(match.params.id);
+    }
+  }
+
+  public componentDidUpdate() {
+    const { book } = this.props;
+    const { isUpdateFromProps } = this.state;
+    if (book && !isUpdateFromProps) {
+      this.setState({
+        values: Book.clone(book),
+        isUpdateFromProps: true,
+      });
     }
   }
 
@@ -181,9 +199,13 @@ class AddBook extends PureComponent<IProps, IState> {
   }
 }
 
+const mapStateToProps = (state: IStateType): IMapStateToProps => ({
+  book: bookSelector(state.book),
+});
+
 const mapDispatchToProps: IMapDispatchToProps = {
   dispatchAddBook: addBookAction,
   dispatchGetBookId: getBookById,
 };
 
-export default connect(null, mapDispatchToProps)(withStyles(styles)(AddBook));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(AddBook));
