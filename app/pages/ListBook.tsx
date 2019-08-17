@@ -6,7 +6,6 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import Typography from '@material-ui/core/Typography';
 import NavigateBefore from '@material-ui/icons/NavigateBefore';
 import NavigateNext from '@material-ui/icons/NavigateNext';
@@ -104,10 +103,6 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
     justifyContent: 'flex-end',
   },
-  progress: {
-    position: 'absolute',
-    width: '100%',
-  },
   control: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -151,11 +146,6 @@ class ListBook extends PureComponent<IProps, IState> {
 
     return (
       <Fragment>
-        {(isLoading) && (
-          <Box position="relative">
-            <LinearProgress color="secondary" className={classes.progress} />
-          </Box>
-        )}
         <Box my={1}>
           <div className={classes.control}>
             <BookFilters type={type} onChangeType={this.handleChangeType} />

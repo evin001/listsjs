@@ -97,6 +97,7 @@ export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBoo
 export const rootSelector = (state: any) => state.book;
 export const bookListSelector = (state: IBookState) => state.books;
 export const bookSelector = (state: IBookState) => state.book;
+export const isLoadingSelector = (state: IBookState) => state.isLoading;
 
 // Actions Creators
 export function addBookAction(book: IBook) {
