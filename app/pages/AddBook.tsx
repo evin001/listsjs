@@ -5,27 +5,19 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, Theme, WithStyles, withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { KeyboardDatePicker , MuiPickersUtilsProvider } from '@material-ui/pickers';
 import ruLocale from 'date-fns/locale/ru';
 import { Book, IBook } from 'lists-core/domain';
 import { BaseType, baseTypeList } from 'lists-core/domain/Book';
-import React from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { addBookAction } from '~/adapters';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    formControl: {
-      margin: theme.spacing(2, 0, 1),
-      minWidth: 238,
-    },
-  }));
+import { addBookAction, getBookById } from '~/adapters';
 
 interface ICommonProps {}
 
-interface IState {
+interface IBookState {
   readingTarget?: string;
   author: string;
   name: string;
@@ -34,129 +26,164 @@ interface IState {
   type: BaseType;
 }
 
-interface IProps {
+interface IMapDispatchToProps {
   dispatchAddBook: (book: IBook) => void;
+  dispatchGetBookId: (id: string) => void;
 }
 
-const addBook = (props: IProps) => {
-  const classes = useStyles();
-  const [values, setValues] = React.useState<Book>(new Book());
-  const commonProps: ICommonProps = {
-    fullWidth: true,
-    margin: 'normal',
+interface IProps extends WithStyles<typeof styles>, IMapDispatchToProps {
+  match: {
+    params: {
+      id?: string,
+    },
+  };
+}
+
+interface IState {
+  values: Book;
+}
+
+const styles = (theme: Theme) => createStyles({
+  formControl: {
+    margin: theme.spacing(2, 0, 1),
+    minWidth: 238,
+  },
+});
+
+class AddBook extends PureComponent<IProps, IState> {
+
+  public state = {
+    values: new Book(),
   };
 
-  function handleChangeInput(name: keyof IState) {
+  public componentDidMount() {
+    const { match, dispatchGetBookId } = this.props;
+    if (match.params.id) {
+      dispatchGetBookId(match.params.id);
+    }
+  }
+
+  public render() {
+    const { classes } = this.props;
+    const { values } = this.state;
+    const commonProps: ICommonProps = {
+      fullWidth: true,
+      margin: 'normal',
+    };
+
+    return (
+      <form autoComplete="off">
+        <Box>
+          <TextField
+            label="Цель прочтения"
+            value={values.readingTarget}
+            onChange={this.handleChangeInput('readingTarget')}
+            helperText={`${values.readingTarget && values.readingTarget.length || 0}/${Book.readingTargetMaxLength}`}
+            {...commonProps}
+          />
+        </Box>
+        <Box>
+          <TextField
+            required
+            error={values.isErrorAuthor}
+            label="Автор"
+            value={values.author}
+            onChange={this.handleChangeInput('author')}
+            helperText={`${values.author && values.author.length || 0}/${Book.authorMaxLength}`}
+            {...commonProps}
+          />
+        </Box>
+        <Box>
+          <TextField
+            required
+            error={values.isErrorName}
+            label="Название"
+            value={values.name}
+            onChange={this.handleChangeInput('name')}
+            helperText={`${values.name && values.name.length || 0}/${Book.nameMaxLength}`}
+            {...commonProps}
+          />
+        </Box>
+        <Box>
+          <TextField
+            required
+            error={values.isErrorDescription}
+            label="Описание"
+            value={values.description}
+            onChange={this.handleChangeInput('description')}
+            multiline={true}
+            rowsMax="10"
+            helperText={`${values.description && values.description.length || 0}/${Book.descriptionMaxLength}`}
+            {...commonProps}
+          />
+        </Box>
+        {values.type === BaseType.Done && (
+          <Box>
+            <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ruLocale}>
+              <KeyboardDatePicker
+                margin="normal"
+                label="Дата прочтения"
+                format="dd.MM.yyyy"
+                value={values.doneDate}
+                onChange={this.handleChangeDate}
+              />
+            </MuiPickersUtilsProvider>
+          </Box>
+        )}
+        <Box>
+          <FormControl className={classes.formControl}>
+            <InputLabel htmlFor="list-type">Список</InputLabel>
+            <Select
+              value={values.type}
+              inputProps={{ id: 'list-type', name: 'type' }}
+              onChange={this.handleChangeSelect}
+            >
+              {baseTypeList.map((data) => (
+                <MenuItem key={data.key} value={data.key}>{data.label}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Button
+          disabled={values.isError}
+          variant="contained"
+          color="primary"
+          onClick={this.handleClickAdd}
+        >
+          Добавить
+        </Button>
+      </form>
+    );
+  }
+
+  private handleChangeInput = (name: keyof IBookState) => {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
-      const cloneBook = Book.clone(values);
+      const cloneBook = Book.clone(this.state.values);
       (cloneBook[name] as string) = event.target.value;
-      setValues(cloneBook);
+      this.setState({ values: cloneBook });
     };
   }
 
-  function handleChangeSelect(event: React.ChangeEvent<{ name?: string, value: unknown }>) {
-    const cloneBook = Book.clone(values);
+  private handleChangeSelect = (event: React.ChangeEvent<{ name?: string, value: unknown }>) => {
+    const cloneBook = Book.clone(this.state.values);
     cloneBook.type = event.target.value as BaseType;
-    setValues(cloneBook);
+    this.setState({ values: cloneBook });
   }
 
-  function handleChangeDate(date: Date | null) {
-    const cloneBook = Book.clone(values);
+  private handleChangeDate = (date: Date | null) => {
+    const cloneBook = Book.clone(this.state.values);
     cloneBook.doneDate = date;
-    setValues(cloneBook);
+    this.setState({ values: cloneBook });
   }
 
-  function handleClickAdd() {
-    props.dispatchAddBook(values);
+  private handleClickAdd = () => {
+    this.props.dispatchAddBook(this.state.values);
   }
+}
 
-  return (
-    <form autoComplete="off">
-      <Box>
-        <TextField
-          label="Цель прочтения"
-          value={values.readingTarget}
-          onChange={handleChangeInput('readingTarget')}
-          helperText={`${values.readingTarget && values.readingTarget.length || 0}/${Book.readingTargetMaxLength}`}
-          {...commonProps}
-        />
-      </Box>
-      <Box>
-        <TextField
-          required
-          error={values.isErrorAuthor}
-          label="Автор"
-          value={values.author}
-          onChange={handleChangeInput('author')}
-          helperText={`${values.author && values.author.length || 0}/${Book.authorMaxLength}`}
-          {...commonProps}
-        />
-      </Box>
-      <Box>
-        <TextField
-          required
-          error={values.isErrorName}
-          label="Название"
-          value={values.name}
-          onChange={handleChangeInput('name')}
-          helperText={`${values.name && values.name.length || 0}/${Book.nameMaxLength}`}
-          {...commonProps}
-        />
-      </Box>
-      <Box>
-        <TextField
-          required
-          error={values.isErrorDescription}
-          label="Описание"
-          value={values.description}
-          onChange={handleChangeInput('description')}
-          multiline={true}
-          rowsMax="10"
-          helperText={`${values.description && values.description.length || 0}/${Book.descriptionMaxLength}`}
-          {...commonProps}
-        />
-      </Box>
-      {values.type === BaseType.Done && (
-        <Box>
-          <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ruLocale}>
-            <KeyboardDatePicker
-              margin="normal"
-              label="Дата прочтения"
-              format="dd.MM.yyyy"
-              value={values.doneDate}
-              onChange={handleChangeDate}
-            />
-          </MuiPickersUtilsProvider>
-        </Box>
-      )}
-      <Box>
-        <FormControl className={classes.formControl}>
-          <InputLabel htmlFor="list-type">Список</InputLabel>
-          <Select
-            value={values.type}
-            inputProps={{ id: 'list-type', name: 'type' }}
-            onChange={handleChangeSelect}
-          >
-            {baseTypeList.map((data) => (
-              <MenuItem key={data.key} value={data.key}>{data.label}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-      <Button
-        disabled={values.isError}
-        variant="contained"
-        color="primary"
-        onClick={handleClickAdd}
-      >
-        Добавить
-      </Button>
-    </form>
-  );
-};
-
-const mapDispatchToProps = {
+const mapDispatchToProps: IMapDispatchToProps = {
   dispatchAddBook: addBookAction,
+  dispatchGetBookId: getBookById,
 };
 
-export default connect(null, mapDispatchToProps)(addBook);
+export default connect(null, mapDispatchToProps)(withStyles(styles)(AddBook));

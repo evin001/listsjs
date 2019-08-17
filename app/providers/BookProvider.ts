@@ -7,6 +7,21 @@ import { AppStoreProvider } from './AppStoreProvider';
 
 export class BookProvider implements IBookProvider {
   private static collection = 'books';
+
+  private static docToBook(data: firebase.firestore.DocumentData): Book {
+    const book = new Book();
+    book.author = data.author;
+    book.description = data.description;
+    book.name = data.name;
+    book.readingTarget = data.readingTarget;
+    book.type = data.type;
+    if (data.cover) { book.cover = data.cover; }
+    if (data.doneDate instanceof firebase.firestore.Timestamp) {
+      book.doneDate = data.doneDate.toDate();
+    }
+    return book;
+  }
+
   private store: firebase.firestore.Firestore =
     (AppStoreProvider.getInstance().getStore() as firebase.firestore.Firestore);
 
@@ -36,24 +51,24 @@ export class BookProvider implements IBookProvider {
     let collections: OrderedMap<string, IBook> = OrderedMap();
 
     books.forEach((doc) => {
-      const data = doc.data();
-
-      const book = new Book();
-      book.author = data.author;
-      book.description = data.description;
-      book.name = data.name;
-      book.readingTarget = data.readingTarget;
-      book.type = data.type;
-      if (data.cover) { book.cover = data.cover; }
-      if (data.doneDate instanceof firebase.firestore.Timestamp) {
-        book.doneDate = data.doneDate.toDate();
-      }
-
+      const book = BookProvider.docToBook(doc.data());
       collections = collections.set(doc.id, book);
     });
 
     const last = books.docs[books.docs.length - 1] || null;
 
     return [collections, last];
+  }
+
+  public async getBookById(id: string): Promise<Book | null> {
+    const book: firebase.firestore.DocumentSnapshot =
+      await this.store.collection(BookProvider.collection).doc(id).get();
+    if (book.exists) {
+      const data = book.data();
+      if (data) {
+        return BookProvider.docToBook(data);
+      }
+    }
+    return null;
   }
 }

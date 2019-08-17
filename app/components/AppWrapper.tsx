@@ -13,7 +13,8 @@ const AppWrapper = () => {
       <Container maxWidth="md">
         <Header />
         <Route exact path="/" component={ListBookPage} />
-        <Route path="/add-book" component={AddBookPage} />
+        <Route path="/add-book/:id" component={AddBookPage} />
+        <Route exact path="/add-book" component={AddBookPage} />
       </Container>
     </Router>
   );

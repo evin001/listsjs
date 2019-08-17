@@ -17,9 +17,14 @@ export const ADD_BOOK_ERROR = `${appName}/${moduleName}/ADD_BOOK_ERROR`;
 
 export const LIST_BOOK_REQUEST = `${appName}/${moduleName}/LIST_BOOK_REQUEST`;
 export const LIST_BOOK_SUCCESS = `${appName}/${moduleName}/LIST_BOOK_SUCCESS`;
-export const LIST_BOOK_ERROR = `${appName}/${moduleName}/LIST_BOOK_ERROR`;
-export const LIST_BOOK_LOADING = `${appName}/${moduleName}/LIST_BOOK_LOADING`;
 export const LIST_BOOK_RESET = `${appName}/${moduleName}/LIST_BOOK_RESET`;
+
+export const GET_BOOK_REQUEST = `${appName}/${moduleName}/GET_BOOK_REQUEST`;
+export const GET_BOOK_SUCCESS = `${appName}/${moduleName}/GET_BOOK_SUCCESS`;
+
+export const BOOK_LOADING = `${appName}/${moduleName}/BOOK_LOADING`;
+export const BOOK_LOADED = `${appName}/${moduleName}/BOOK_LOADED`;
+export const BOOK_ERROR = `${appName}/${moduleName}/BOOK_ERROR`;
 
 export type BooksType = Map<number, OrderedMap<string, IBook>>;
 
@@ -29,6 +34,7 @@ export interface IListBook {
   done: boolean;
   isLoading: boolean;
   filterType?: FilterType;
+  book?: IBook;
 }
 
 export interface IBookState extends IListBook {}
@@ -44,15 +50,20 @@ export type FilterType  = BaseType | null;
 
 export interface IBookAction {
   type: string;
-  payload: IListBook & FilterType;
+  payload: IListBook & FilterType & IBook;
 }
 
 export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBookState, action) => {
   switch (action.type) {
-    case LIST_BOOK_LOADING:
+    case BOOK_LOADING:
       return {
         ...state,
         isLoading: true,
+      };
+    case BOOK_LOADED:
+      return {
+        ...state,
+        isLoading: false,
       };
     case LIST_BOOK_SUCCESS: {
       return {
@@ -62,7 +73,6 @@ export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBoo
         ...(action.payload.books.size > 0 ? {
           books: state.books.setIn([state.books.size], action.payload.books),
         } : {}),
-        isLoading: false,
       };
     }
     case LIST_BOOK_RESET:
@@ -72,6 +82,11 @@ export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBoo
         books: Map(),
         done: false,
         filterType: action.payload,
+      };
+    case GET_BOOK_SUCCESS:
+      return {
+        ...state,
+        book: action.payload,
       };
     default:
       return state;
@@ -121,16 +136,15 @@ export function listBookSuccessAction(books: Map<string, IBook> | null, lastDoc:
   };
 }
 
-export function listBookLoadingAction() {
+export function bookLoadingAction() {
   return {
-    type: LIST_BOOK_LOADING,
+    type: BOOK_LOADING,
   };
 }
 
-export function listBookErrorAction(error: any) {
+export function bookLoadedAction() {
   return {
-    type: LIST_BOOK_ERROR,
-    error,
+    type: BOOK_LOADED,
   };
 }
 
@@ -138,6 +152,27 @@ export function listBookResetAction(type: FilterType) {
   return {
     type: LIST_BOOK_RESET,
     payload: type,
+  };
+}
+
+export function bookErrorAction(error: any) {
+  return {
+    type: BOOK_ERROR,
+    error,
+  };
+}
+
+export function getBookById(id: string) {
+  return {
+    type: GET_BOOK_REQUEST,
+    payload: id,
+  };
+}
+
+export function getBookByIdSuccess(book: IBook) {
+  return {
+    type: GET_BOOK_SUCCESS,
+    payload: book,
   };
 }
 
@@ -157,7 +192,7 @@ function* addBookSaga(action: any) {
 function* listBookSaga(action: any) {
   const { payload } = action;
   try {
-    yield put(listBookLoadingAction());
+    yield put(bookLoadingAction());
     const provider = new BookProvider();
     const interactor = new ListBookInteractor(provider);
 
@@ -173,9 +208,24 @@ function* listBookSaga(action: any) {
       [interactor, interactor.listBook],
       lastDocFromState, payload,
     );
+    yield put(bookLoadedAction());
     yield put(listBookSuccessAction(books, lastDoc));
   } catch (error) {
-    yield put(listBookErrorAction(error));
+    yield put(bookErrorAction(error));
+  }
+}
+
+function* getBookByIdSaga(action: any) {
+  const { payload } = action;
+  try {
+    yield put(bookLoadingAction());
+    const provider = new BookProvider();
+    const interactor = new ListBookInteractor(provider);
+    const book = yield call([interactor, interactor.getBookById], payload);
+    yield put(bookLoadedAction());
+    yield put(getBookByIdSuccess(book));
+  } catch (error) {
+    yield put(bookErrorAction(error));
   }
 }
 
@@ -183,5 +233,6 @@ export function* bookSaga() {
   yield all([
     takeEvery(ADD_BOOK_REQUEST, addBookSaga),
     takeEvery(LIST_BOOK_REQUEST, listBookSaga),
+    takeEvery(GET_BOOK_REQUEST, getBookByIdSaga),
   ]);
 }
