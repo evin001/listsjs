@@ -2,11 +2,11 @@ import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import React from 'react';
 import { Provider } from 'react-redux';
+import { HashRouter as Router } from 'react-router-dom';
 import '~/assets/fonts/stylesheet.css';
 import { configureStore } from '~/frameworks';
 import injectSheet from '~/styles/reset';
 import AppWrapper from './AppWrapper';
-import { HashRouter as Router } from 'react-router-dom';
 
 const theme = createMuiTheme({
   palette: {

@@ -26,6 +26,7 @@ interface IMapStateToProps {
   done: boolean;
   isLoading: boolean;
   books: BooksType;
+  filterType?: FilterType;
 }
 
 interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActions, ILocationActions {}
@@ -117,7 +118,6 @@ class ListBook extends PureComponent<IProps, IState> {
 
   public state = {
     current: pageMachine.initialState,
-    filterType: null,
   };
 
   public service = interpret(pageMachine).onTransition((current) => {
@@ -126,7 +126,7 @@ class ListBook extends PureComponent<IProps, IState> {
 
   public componentDidMount() {
     this.service.start();
-    this.props.getListBook();
+    this.handleChangeType(this.props.filterType, true);
   }
 
   public componentDidUpdate() {
@@ -205,11 +205,11 @@ class ListBook extends PureComponent<IProps, IState> {
     this.props.redirect(uri);
   }
 
-  private handleChangeType = (value: BaseType) => {
+  private handleChangeType = (value?: BaseType | null, reset?: boolean) => {
     this.service.send([
       'RESET',
-      { type: 'FILTER', value, callback: (type: FilterType) => {
-          this.props.getListBook(type);
+      { type: 'FILTER', value: value || null, callback: (type: FilterType) => {
+          this.props.getListBook(type, reset);
         } },
     ]);
   }
@@ -232,6 +232,7 @@ const mapStateToProps = (state: IStateType): IMapStateToProps => ({
   books: state.book.books,
   done: state.book.done,
   isLoading: state.loader.isLoading,
+  filterType: state.book.filterType,
 });
 
 export default connect(mapStateToProps, {

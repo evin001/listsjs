@@ -89,10 +89,10 @@ function addBookAction(book: IBook, id?: string, uri?: string) {
   };
 }
 
-function getListBookAction(filter?: FilterType) {
+function getListBookAction(filter?: FilterType, reset?: boolean) {
   return {
     type: LIST_BOOK_REQUEST,
-    payload: filter,
+    payload: { filter, reset },
   };
 }
 
@@ -166,7 +166,7 @@ function* addBookSaga(action: any) {
 }
 
 function* listBookSaga(action: any) {
-  const { payload } = action;
+  const { payload: { filter, reset } } = action;
   try {
     yield put(loaderActions.loading());
     const provider = new BookProvider();
@@ -174,15 +174,15 @@ function* listBookSaga(action: any) {
 
     let state: IBookState = yield select(rootSelector);
 
-    if ((state.filterType || payload) && state.filterType !== payload) {
-      yield put(resetListBookAction(payload));
+    if ((state.filterType || filter) && state.filterType !== filter || reset) {
+      yield put(resetListBookAction(filter));
       state = yield select(rootSelector);
     }
 
     const lastDocFromState = state.lastDoc;
     const [books, lastDoc] = yield call(
       [interactor, interactor.listBook],
-      lastDocFromState, payload,
+      lastDocFromState, filter,
     );
     yield put(getListBookSuccessAction(books, lastDoc));
   } catch (error) {
