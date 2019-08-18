@@ -6,6 +6,7 @@ import '~/assets/fonts/stylesheet.css';
 import { configureStore } from '~/frameworks';
 import injectSheet from '~/styles/reset';
 import AppWrapper from './AppWrapper';
+import { HashRouter as Router } from 'react-router-dom';
 
 const theme = createMuiTheme({
   palette: {
@@ -16,7 +17,9 @@ const theme = createMuiTheme({
 const AppPresenter = () => (
   <Provider store={configureStore()}>
     <ThemeProvider theme={theme}>
-      <AppWrapper />
+      <Router>
+        <AppWrapper />
+      </Router>
     </ThemeProvider>
   </Provider>
 );

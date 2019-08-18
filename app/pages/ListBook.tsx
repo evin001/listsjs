@@ -10,11 +10,15 @@ import Typography from '@material-ui/core/Typography';
 import NavigateBefore from '@material-ui/icons/NavigateBefore';
 import NavigateNext from '@material-ui/icons/NavigateNext';
 import { BaseType } from 'lists-core/domain/Book';
-import React, { Fragment, PureComponent } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { assign, EventObject, interpret, Machine, State } from 'xstate';
-import { bookActions, bookListSelector, BooksType, FilterType, IBookActions } from '~/adapters';
+import {
+  bookActions, bookListSelector, BooksType,
+  FilterType, IBookActions,
+  ILocationActions, locationActions,
+} from '~/adapters';
 import BookFilters from '~/components/BookFilters';
 import { IStateType } from '~/frameworks';
 
@@ -24,7 +28,7 @@ interface IMapStateToProps {
   books: BooksType;
 }
 
-interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActions {}
+interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActions, ILocationActions {}
 
 interface IState {
   current: State<IPageContext, PageEvent>;
@@ -104,6 +108,9 @@ const styles = (theme: Theme) => createStyles({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  addBook: {
+    marginTop: theme.spacing(1),
+  },
 });
 
 class ListBook extends PureComponent<IProps, IState> {
@@ -141,48 +148,61 @@ class ListBook extends PureComponent<IProps, IState> {
     const listBooks = books.get(page);
 
     return (
-      <Fragment>
-        <Box my={1}>
-          <div className={classes.control}>
-            <BookFilters type={type} onChangeType={this.handleChangeType} />
-            <Box className={classes.pagination}>
-              <IconButton
-                className={classes.button}
-                onClick={this.handleClickBeforePage}
-                disabled={page === 0}
-              >
-                <NavigateBefore />
-              </IconButton>
-              <IconButton
-                onClick={this.handleClickNextPage}
-                disabled={done && page + 1 === books.size}
-              >
-                <NavigateNext />
-              </IconButton>
-            </Box>
-          </div>
+      <Box my={1}>
+        <div className={classes.control}>
+          <BookFilters type={type} onChangeType={this.handleChangeType} />
+          <Box className={classes.pagination}>
+            <IconButton
+              className={classes.button}
+              onClick={this.handleClickBeforePage}
+              disabled={page === 0}
+            >
+              <NavigateBefore />
+            </IconButton>
+            <IconButton
+              onClick={this.handleClickNextPage}
+              disabled={done && page + 1 === books.size}
+            >
+              <NavigateNext />
+            </IconButton>
+          </Box>
+        </div>
 
-          {!isLoading && (
-            <Grid container spacing={2}>
-              {listBooks && listBooks.map(((value, key) => (
-                <Grid item xs={4} key={key}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" component="h2">{value.name}</Typography>
-                      <Typography color="textSecondary">{value.author}</Typography>
-                      <Typography variant="body2" component="p">{value.shortDescription}</Typography>
-                    </CardContent>
-                    <CardActions>
-                      <Button size="small" component={Link} to={`/add-book/${key}`}>Подробнее</Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
-              ))).valueSeq().toArray()}
-            </Grid>
-          )}
-        </Box>
-      </Fragment>
+        {!isLoading && (
+          <Grid container spacing={2}>
+            {listBooks && listBooks.map(((value, key) => (
+              <Grid item xs={4} key={key}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" component="h2">{value.name}</Typography>
+                    <Typography color="textSecondary">{value.author}</Typography>
+                    <Typography variant="body2" component="p">{value.shortDescription}</Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button size="small" component={Link} to={`/add-book/${key}`}>Подробнее</Button>
+                  </CardActions>
+                </Card>
+              </Grid>
+            ))).valueSeq().toArray()}
+          </Grid>
+        )}
+
+        <Button
+          className={classes.addBook}
+          variant="contained"
+          color="primary"
+          onClick={this.handleClickAddBook}
+        >
+          Добавить книгу
+        </Button>
+      </Box>
     );
+  }
+
+  private handleClickAddBook = () => {
+    const { current: { context: { type } } } = this.state;
+    const uri = type ? `/add-book/type/${type}` : '/add-book';
+    this.props.redirect(uri);
   }
 
   private handleChangeType = (value: BaseType) => {
@@ -211,7 +231,10 @@ class ListBook extends PureComponent<IProps, IState> {
 const mapStateToProps = (state: IStateType): IMapStateToProps => ({
   books: bookListSelector(state.book),
   done: state.book.done,
-  isLoading: state.book.isLoading,
+  isLoading: state.loader.isLoading,
 });
 
-export default connect(mapStateToProps, bookActions)(withStyles(styles)(ListBook));
+export default connect(mapStateToProps, {
+  ...bookActions,
+  ...locationActions,
+})(withStyles(styles)(ListBook));

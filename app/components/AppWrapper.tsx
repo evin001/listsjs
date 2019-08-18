@@ -1,10 +1,8 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import React from 'react';
-import { HashRouter as Router, Route } from 'react-router-dom';
-import AddBookPage from '~/pages/AddBook';
-import ListBookPage from '~/pages/ListBook';
+import React, { Fragment } from 'react';
+import BaseRouter from './BaseRouter';
 import Header from './Header';
 import Loader from './Loader';
 import Notification from './Notification';
@@ -18,17 +16,15 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 const AppWrapper = () => {
   const classes = useStyles();
   return (
-    <Router>
+    <Fragment>
       <CssBaseline />
       <Container maxWidth="md" classes={{ root: classes.root }}>
         <Header />
         <Loader />
         <Notification />
-        <Route exact path="/" component={ListBookPage} />
-        <Route path="/add-book/:id" component={AddBookPage} />
-        <Route exact path="/add-book" component={AddBookPage} />
+        <BaseRouter />
       </Container>
-    </Router>
+    </Fragment>
   );
 };
 

@@ -35,6 +35,7 @@ interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActio
   match: {
     params: {
       id?: string,
+      type?: BaseType,
     },
   };
 }
@@ -63,8 +64,15 @@ class AddBook extends PureComponent<IProps, IState> {
 
   public componentDidMount() {
     const { match, getBook } = this.props;
+
     if (match.params.id) {
       getBook(match.params.id);
+    }
+
+    if (match.params.type) {
+      const cloneBook = Book.clone(this.state.values);
+      cloneBook.type = match.params.type as BaseType;
+      this.setState({ values: cloneBook });
     }
   }
 
