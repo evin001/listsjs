@@ -37,24 +37,24 @@ export const loaderReducer: Reducer<ILoaderState, ILoaderAction> = (state = init
 };
 
 // Actions Creators
-function loading() {
+function loadingAction() {
   return {
     type: LOADER_LOADING,
   };
 }
 
-function loaded() {
+function loadedAction() {
   return {
     type: LOADER_LOADED,
   };
 }
 
 export interface ILoaderActions {
-  loading: typeof loading;
-  loaded: typeof loaded;
+  loading: typeof loadingAction;
+  loaded: typeof loadedAction;
 }
 
 export const loaderActions: ILoaderActions = {
-  loading,
-  loaded,
+  loading: loadingAction,
+  loaded: loadedAction,
 };

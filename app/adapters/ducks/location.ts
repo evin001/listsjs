@@ -6,7 +6,7 @@ import { appName, moduleName } from '../constants';
 export const LOCATION_REDIRECT = `${appName}/${moduleName}/LOCATION_REDIRECT`;
 
 // Actions Creators
-function redirect(uri: string) {
+function redirectAction(uri: string) {
   return {
     type: LOCATION_REDIRECT,
     payload: uri,
@@ -14,11 +14,11 @@ function redirect(uri: string) {
 }
 
 export interface ILocationActions {
-  redirect: typeof redirect;
+  redirect: typeof redirectAction;
 }
 
 export const locationActions: ILocationActions = {
-  redirect,
+  redirect: redirectAction,
 };
 
 // Sagas

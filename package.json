@@ -16,6 +16,7 @@
     "@material-ui/icons": "^4.2.1",
     "@material-ui/pickers": "^3.1.2",
     "@material-ui/styles": "^4.2.0",
+    "@sentry/browser": "^5.6.1",
     "clsx": "^1.0.4",
     "date-fns": "^2.0.0-beta.2",
     "firebase": "^6.3.0",

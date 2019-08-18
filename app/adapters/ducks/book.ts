@@ -7,6 +7,7 @@ import { Reducer } from 'redux';
 import { all, call, put, select, takeEvery } from 'redux-saga/effects';
 import { BookProvider } from '~/providers';
 import { appName, moduleName } from '../constants';
+import { errorActions } from './error';
 import { loaderActions } from './loader';
 import { locationActions } from './location';
 import { notificationActions, NotificationType } from './notification';
@@ -20,8 +21,6 @@ export const LIST_BOOK_RESET = `${appName}/${moduleName}/LIST_BOOK_RESET`;
 
 export const GET_BOOK_REQUEST = `${appName}/${moduleName}/GET_BOOK_REQUEST`;
 export const GET_BOOK_SUCCESS = `${appName}/${moduleName}/GET_BOOK_SUCCESS`;
-
-export const BOOK_ERROR = `${appName}/${moduleName}/BOOK_ERROR`;
 
 export type BooksType = Map<number, OrderedMap<string, IBook>>;
 
@@ -123,13 +122,6 @@ function resetListBookAction(type: FilterType) {
   };
 }
 
-function setError(error: any) {
-  return {
-    type: BOOK_ERROR,
-    error,
-  };
-}
-
 function getBookSuccessAction(book: IBook) {
   return {
     type: GET_BOOK_SUCCESS,
@@ -157,7 +149,6 @@ function* addBookSaga(action: any) {
     const provider = new BookProvider();
     const interactor = new AddBookInteractor(provider);
     yield call([interactor, interactor.addBook], payload.book, payload.id);
-    yield put(loaderActions.loaded());
     yield put(notificationActions.showMessage(
       payload.id ? 'Книга обновлена' : 'Книга добавлена',
       NotificationType.Success,
@@ -166,11 +157,13 @@ function* addBookSaga(action: any) {
       yield put(locationActions.redirect(payload.uri));
     }
   } catch (error) {
-    yield put(setError(error));
+    yield put(errorActions.handle(error));
     yield put(notificationActions.showMessage(
       payload.id ? 'Не удалось обновить книгу' : 'Не удалось добавить книгу',
       NotificationType.Error,
     ));
+  } finally {
+    yield put(loaderActions.loaded());
   }
 }
 
@@ -193,10 +186,11 @@ function* listBookSaga(action: any) {
       [interactor, interactor.listBook],
       lastDocFromState, payload,
     );
-    yield put(loaderActions.loaded());
     yield put(getListBookSuccessAction(books, lastDoc));
   } catch (error) {
-    yield put(setError(error));
+    yield put(errorActions.handle(error));
+  } finally {
+    yield put(loaderActions.loaded());
   }
 }
 
@@ -207,10 +201,11 @@ function* getBookByIdSaga(action: any) {
     const provider = new BookProvider();
     const interactor = new ListBookInteractor(provider);
     const book = yield call([interactor, interactor.getBookById], payload);
-    yield put(loaderActions.loaded());
     yield put(getBookSuccessAction(book));
   } catch (error) {
-    yield put(setError(error));
+    yield put(errorActions.handle(error));
+  } finally {
+    yield put(loaderActions.loaded());
   }
 }
 
