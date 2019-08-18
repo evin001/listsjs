@@ -13,7 +13,7 @@ import { Book } from 'lists-core/domain';
 import { BaseType, baseTypeList } from 'lists-core/domain/Book';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { bookActions, bookSelector, IBookActions } from '~/adapters';
+import { bookActions, bookSelector, IBookActions, ILocationActions, locationActions } from '~/adapters';
 import { IStateType } from '~/frameworks';
 
 interface ICommonProps {}
@@ -31,7 +31,7 @@ interface IMapStateToProps {
   book?: Book;
 }
 
-interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActions {
+interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActions, ILocationActions {
   match: {
     params: {
       id?: string,
@@ -48,6 +48,9 @@ const styles = (theme: Theme) => createStyles({
   formControl: {
     margin: theme.spacing(2, 0, 1),
     minWidth: 238,
+  },
+  cancel: {
+    marginLeft: theme.spacing(2),
   },
 });
 
@@ -165,8 +168,13 @@ class AddBook extends PureComponent<IProps, IState> {
         >
           {match.params.id ? 'Обновить' : 'Добавить'}
         </Button>
+        <Button className={classes.cancel} onClick={this.handleCancel}>Отменить</Button>
       </form>
     );
+  }
+
+  private handleCancel = () => {
+    this.props.redirect('/');
   }
 
   private handleChangeInput = (name: keyof IBookState) => {
@@ -199,4 +207,7 @@ const mapStateToProps = (state: IStateType): IMapStateToProps => ({
   book: bookSelector(state.book),
 });
 
-export default connect(mapStateToProps, bookActions)(withStyles(styles)(AddBook));
+export default connect(mapStateToProps, {
+  ...bookActions,
+  ...locationActions,
+})(withStyles(styles)(AddBook));
