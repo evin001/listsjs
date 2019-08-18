@@ -183,13 +183,13 @@ function* addBookSaga(action: any) {
     const interactor = new AddBookInteractor(provider);
     yield call([interactor, interactor.addBook], payload.book, payload.id);
     yield put(loadedBookAction());
-    yield put(notificationActions.show(
+    yield put(notificationActions.showMessage(
       payload.id ? 'Книга обновлена' : 'Книга добавлена',
       NotificationType.Success,
     ));
   } catch (error) {
     yield put(setError(error));
-    yield put(notificationActions.show(
+    yield put(notificationActions.showMessage(
       payload.id ? 'Не удалось обновить книгу' : 'Не удалось добавить книгу',
       NotificationType.Error,
     ));
