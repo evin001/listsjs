@@ -108,6 +108,7 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: theme.spacing(1),
   },
   addBook: {
     marginTop: theme.spacing(2),
