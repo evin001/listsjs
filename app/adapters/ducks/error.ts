@@ -5,7 +5,12 @@ import { appName, moduleName } from '../constants';
 // Actions
 const ERROR_CONSOLE = `${appName}/${moduleName}/ERROR_CONSOLE`;
 
-function consoleAction(error: any) {
+export interface IHandleAction {
+  type: string;
+  error: Error;
+}
+
+function handleAction(error: Error): IHandleAction {
   return {
     type: ERROR_CONSOLE,
     error,
@@ -13,15 +18,15 @@ function consoleAction(error: any) {
 }
 
 export interface IErrorActions {
-  handle: typeof consoleAction;
+  handle: typeof handleAction;
 }
 
 export const errorActions: IErrorActions = {
-  handle: consoleAction,
+  handle: handleAction,
 };
 
 // Sagas
-function* handleErrorSaga(action: any) {
+function* handleErrorSaga(action: IHandleAction) {
   yield Sentry.captureException(action.error);
 }
 
