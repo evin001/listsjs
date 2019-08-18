@@ -119,7 +119,7 @@ class ListBook extends PureComponent<IProps, IState> {
 
   public componentDidMount() {
     this.service.start();
-    this.props.list();
+    this.props.getListBook();
   }
 
   public componentDidUpdate() {
@@ -189,7 +189,7 @@ class ListBook extends PureComponent<IProps, IState> {
     this.service.send([
       'RESET',
       { type: 'FILTER', value, callback: (type: FilterType) => {
-          this.props.list(type);
+          this.props.getListBook(type);
         } },
     ]);
   }
@@ -202,7 +202,7 @@ class ListBook extends PureComponent<IProps, IState> {
     const { books, done } = this.props;
     const { current } = this.state;
     if (!(done || books.get(current.context.page + 1))) {
-      this.props.list(current.context.type);
+      this.props.getListBook(current.context.type);
     }
     this.service.send('INC');
   }

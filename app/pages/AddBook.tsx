@@ -59,9 +59,9 @@ class AddBook extends PureComponent<IProps, IState> {
   };
 
   public componentDidMount() {
-    const { match, get } = this.props;
+    const { match, getBook } = this.props;
     if (match.params.id) {
-      get(match.params.id);
+      getBook(match.params.id);
     }
   }
 
@@ -190,8 +190,8 @@ class AddBook extends PureComponent<IProps, IState> {
   }
 
   private handleClickAdd = () => {
-    const { add, match } = this.props;
-    add(this.state.values, match.params.id);
+    const { addBook, match } = this.props;
+    addBook(this.state.values, match.params.id);
   }
 }
 

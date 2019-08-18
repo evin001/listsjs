@@ -98,28 +98,28 @@ export const bookSelector = (state: IBookState) => state.book;
 export const isLoadingSelector = (state: IBookState) => state.isLoading;
 
 // Actions Creators
-function add(book: IBook, id?: string) {
+function addBookAction(book: IBook, id?: string) {
   return {
     type: ADD_BOOK_REQUEST,
     payload: { book, id },
   };
 }
 
-function list(filter?: FilterType) {
+function getListBookAction(filter?: FilterType) {
   return {
     type: LIST_BOOK_REQUEST,
     payload: filter,
   };
 }
 
-function get(id: string) {
+function getBookAction(id: string) {
   return {
     type: GET_BOOK_REQUEST,
     payload: id,
   };
 }
 
-function listSuccess(books: Map<string, IBook> | null, lastDoc: any) {
+function getListBookSuccessAction(books: Map<string, IBook> | null, lastDoc: any) {
   return {
     type: LIST_BOOK_SUCCESS,
     payload: {
@@ -129,19 +129,19 @@ function listSuccess(books: Map<string, IBook> | null, lastDoc: any) {
   };
 }
 
-function loading() {
+function loadingBookAction() {
   return {
     type: BOOK_LOADING,
   };
 }
 
-function loaded() {
+function loadedBookAction() {
   return {
     type: BOOK_LOADED,
   };
 }
 
-function resetList(type: FilterType) {
+function resetListBookAction(type: FilterType) {
   return {
     type: LIST_BOOK_RESET,
     payload: type,
@@ -155,7 +155,7 @@ function setError(error: any) {
   };
 }
 
-function getSuccess(book: IBook) {
+function getBookSuccessAction(book: IBook) {
   return {
     type: GET_BOOK_SUCCESS,
     payload: book,
@@ -163,26 +163,26 @@ function getSuccess(book: IBook) {
 }
 
 export interface IBookActions {
-  add: typeof add;
-  list: typeof list;
-  get: typeof get;
+  addBook: typeof addBookAction;
+  getListBook: typeof getListBookAction;
+  getBook: typeof getBookAction;
 }
 
 export const bookActions: IBookActions = {
-  add,
-  list,
-  get,
+  addBook: addBookAction,
+  getListBook: getListBookAction,
+  getBook: getBookAction,
 };
 
 // Sagas
 function* addBookSaga(action: any) {
   const { payload } = action;
   try {
-    yield put(loading());
+    yield put(loadingBookAction());
     const provider = new BookProvider();
     const interactor = new AddBookInteractor(provider);
     yield call([interactor, interactor.addBook], payload.book, payload.id);
-    yield put(loaded());
+    yield put(loadedBookAction());
     yield put(notificationActions.show(
       payload.id ? 'Книга обновлена' : 'Книга добавлена',
       NotificationType.Success,
@@ -199,14 +199,14 @@ function* addBookSaga(action: any) {
 function* listBookSaga(action: any) {
   const { payload } = action;
   try {
-    yield put(loading());
+    yield put(loadingBookAction());
     const provider = new BookProvider();
     const interactor = new ListBookInteractor(provider);
 
     let state: IBookState = yield select(rootSelector);
 
     if ((state.filterType || payload) && state.filterType !== payload) {
-      yield put(resetList(payload));
+      yield put(resetListBookAction(payload));
       state = yield select(rootSelector);
     }
 
@@ -215,8 +215,8 @@ function* listBookSaga(action: any) {
       [interactor, interactor.listBook],
       lastDocFromState, payload,
     );
-    yield put(loaded());
-    yield put(listSuccess(books, lastDoc));
+    yield put(loadedBookAction());
+    yield put(getListBookSuccessAction(books, lastDoc));
   } catch (error) {
     yield put(setError(error));
   }
@@ -225,12 +225,12 @@ function* listBookSaga(action: any) {
 function* getBookByIdSaga(action: any) {
   const { payload } = action;
   try {
-    yield put(loading());
+    yield put(loadingBookAction());
     const provider = new BookProvider();
     const interactor = new ListBookInteractor(provider);
     const book = yield call([interactor, interactor.getBookById], payload);
-    yield put(loaded());
-    yield put(getSuccess(book));
+    yield put(loadedBookAction());
+    yield put(getBookSuccessAction(book));
   } catch (error) {
     yield put(setError(error));
   }
