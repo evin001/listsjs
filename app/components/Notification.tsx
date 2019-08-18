@@ -52,7 +52,7 @@ interface IProps extends INotificationActions {
   type?: NotificationType;
 }
 
-const Notification = ({ message, type, reset }: IProps) => {
+const Notification = ({ message, type, resetMessage }: IProps) => {
   const classes = useStyles();
   const Icon = type && variantIcon[type];
 
@@ -60,7 +60,7 @@ const Notification = ({ message, type, reset }: IProps) => {
     if (reason === 'clickaway') {
       return;
     }
-    reset();
+    resetMessage();
   }
 
   return (

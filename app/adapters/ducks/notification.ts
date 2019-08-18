@@ -46,25 +46,25 @@ export const notificationReducer: Reducer<INotificationState, INotificationActio
   };
 
 // Actions Creators
-function show(message: string, type: NotificationType) {
+function showAction(message: string, type: NotificationType) {
   return {
     type: SHOW_NOTIFICATION,
     payload: { message, type },
   };
 }
 
-function reset() {
+function resetAction() {
   return {
     type: RESET_NOTIFICATION,
   };
 }
 
 export interface INotificationActions {
-  show: typeof show;
-  reset: typeof reset;
+  showMessage: typeof showAction;
+  resetMessage: typeof resetAction;
 }
 
 export const notificationActions: INotificationActions = {
-  show,
-  reset,
+  showMessage: showAction,
+  resetMessage: resetAction,
 };
