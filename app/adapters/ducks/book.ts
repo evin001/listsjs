@@ -7,6 +7,7 @@ import { Reducer } from 'redux';
 import { all, call, put, select, takeEvery } from 'redux-saga/effects';
 import { BookProvider } from '~/providers';
 import { appName, moduleName } from '../constants';
+import { loaderActions } from './loader';
 import { locationActions } from './location';
 import { notificationActions, NotificationType } from './notification';
 
@@ -20,8 +21,6 @@ export const LIST_BOOK_RESET = `${appName}/${moduleName}/LIST_BOOK_RESET`;
 export const GET_BOOK_REQUEST = `${appName}/${moduleName}/GET_BOOK_REQUEST`;
 export const GET_BOOK_SUCCESS = `${appName}/${moduleName}/GET_BOOK_SUCCESS`;
 
-export const BOOK_LOADING = `${appName}/${moduleName}/BOOK_LOADING`;
-export const BOOK_LOADED = `${appName}/${moduleName}/BOOK_LOADED`;
 export const BOOK_ERROR = `${appName}/${moduleName}/BOOK_ERROR`;
 
 export type BooksType = Map<number, OrderedMap<string, IBook>>;
@@ -30,7 +29,6 @@ export interface IListBook {
   lastDoc: firebase.firestore.QueryDocumentSnapshot | null;
   books: BooksType;
   done: boolean;
-  isLoading: boolean;
   filterType?: FilterType;
   book?: Book;
 }
@@ -41,7 +39,6 @@ export const initialBookState: IBookState = {
   lastDoc: null,
   books: Map(),
   done: false,
-  isLoading: false,
 };
 
 export type FilterType  = BaseType | null;
@@ -54,16 +51,6 @@ export interface IBookAction {
 // Reducer
 export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBookState, action) => {
   switch (action.type) {
-    case BOOK_LOADING:
-      return {
-        ...state,
-        isLoading: true,
-      };
-    case BOOK_LOADED:
-      return {
-        ...state,
-        isLoading: false,
-      };
     case LIST_BOOK_SUCCESS: {
       return {
         ...state,
@@ -96,7 +83,6 @@ export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBoo
 export const rootSelector = (state: any) => state.book;
 export const bookListSelector = (state: IBookState) => state.books;
 export const bookSelector = (state: IBookState) => state.book;
-export const isLoadingSelector = (state: IBookState) => state.isLoading;
 
 // Actions Creators
 function addBookAction(book: IBook, id?: string, uri?: string) {
@@ -127,18 +113,6 @@ function getListBookSuccessAction(books: Map<string, IBook> | null, lastDoc: any
       books,
       lastDoc,
     },
-  };
-}
-
-function loadingBookAction() {
-  return {
-    type: BOOK_LOADING,
-  };
-}
-
-function loadedBookAction() {
-  return {
-    type: BOOK_LOADED,
   };
 }
 
@@ -179,11 +153,11 @@ export const bookActions: IBookActions = {
 function* addBookSaga(action: any) {
   const { payload } = action;
   try {
-    yield put(loadingBookAction());
+    yield put(loaderActions.loading());
     const provider = new BookProvider();
     const interactor = new AddBookInteractor(provider);
     yield call([interactor, interactor.addBook], payload.book, payload.id);
-    yield put(loadedBookAction());
+    yield put(loaderActions.loaded());
     yield put(notificationActions.showMessage(
       payload.id ? 'Книга обновлена' : 'Книга добавлена',
       NotificationType.Success,
@@ -203,7 +177,7 @@ function* addBookSaga(action: any) {
 function* listBookSaga(action: any) {
   const { payload } = action;
   try {
-    yield put(loadingBookAction());
+    yield put(loaderActions.loading());
     const provider = new BookProvider();
     const interactor = new ListBookInteractor(provider);
 
@@ -219,7 +193,7 @@ function* listBookSaga(action: any) {
       [interactor, interactor.listBook],
       lastDocFromState, payload,
     );
-    yield put(loadedBookAction());
+    yield put(loaderActions.loaded());
     yield put(getListBookSuccessAction(books, lastDoc));
   } catch (error) {
     yield put(setError(error));
@@ -229,11 +203,11 @@ function* listBookSaga(action: any) {
 function* getBookByIdSaga(action: any) {
   const { payload } = action;
   try {
-    yield put(loadingBookAction());
+    yield put(loaderActions.loading());
     const provider = new BookProvider();
     const interactor = new ListBookInteractor(provider);
     const book = yield call([interactor, interactor.getBookById], payload);
-    yield put(loadedBookAction());
+    yield put(loaderActions.loaded());
     yield put(getBookSuccessAction(book));
   } catch (error) {
     yield put(setError(error));

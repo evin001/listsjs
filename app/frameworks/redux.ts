@@ -1,17 +1,25 @@
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { createLogger } from 'redux-logger';
 import createSagaMiddleware from 'redux-saga';
-import { bookReducer, IBookState, INotificationState, notificationReducer, rootSaga, routerReducer } from '~/adapters';
+import {
+  bookReducer, IBookState,
+  ILoaderState, INotificationState,
+  loaderReducer,
+  notificationReducer,
+  rootSaga, routerReducer,
+} from '~/adapters';
 
 export interface IStateType {
   book: IBookState;
   notification: INotificationState;
+  loader: ILoaderState;
 }
 
 const rootReducer = {
   book: bookReducer,
   notification: notificationReducer,
   router: routerReducer,
+  loader: loaderReducer,
 };
 
 export const configureStore = () => {

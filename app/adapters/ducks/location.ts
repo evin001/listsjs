@@ -5,7 +5,8 @@ import { appName, moduleName } from '../constants';
 // Actions
 export const LOCATION_REDIRECT = `${appName}/${moduleName}/LOCATION_REDIRECT`;
 
-export function redirect(uri: string) {
+// Actions Creators
+function redirect(uri: string) {
   return {
     type: LOCATION_REDIRECT,
     payload: uri,

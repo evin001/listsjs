@@ -3,7 +3,6 @@ import Box from '@material-ui/core/Box';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import React from 'react';
 import { connect } from 'react-redux';
-import { isLoadingSelector } from '~/adapters';
 import { IStateType } from '~/frameworks';
 
 const useStyles = makeStyles(() => createStyles({
@@ -32,7 +31,7 @@ const Loader = ({ isLoading }: IProps) => {
 };
 
 const mapStateToProps = (state: IStateType) => ({
-  isLoading: isLoadingSelector(state.book),
+  isLoading: state.loader.isLoading,
 });
 
 export default connect(mapStateToProps)(Loader);
