@@ -7,6 +7,7 @@ import { Reducer } from 'redux';
 import { all, call, put, select, takeEvery } from 'redux-saga/effects';
 import { BookProvider } from '~/providers';
 import { appName, moduleName } from '../constants';
+import { locationActions } from './location';
 import { notificationActions, NotificationType } from './notification';
 
 // Actions
@@ -98,10 +99,10 @@ export const bookSelector = (state: IBookState) => state.book;
 export const isLoadingSelector = (state: IBookState) => state.isLoading;
 
 // Actions Creators
-function addBookAction(book: IBook, id?: string) {
+function addBookAction(book: IBook, id?: string, uri?: string) {
   return {
     type: ADD_BOOK_REQUEST,
-    payload: { book, id },
+    payload: { book, id, uri },
   };
 }
 
@@ -187,6 +188,9 @@ function* addBookSaga(action: any) {
       payload.id ? 'Книга обновлена' : 'Книга добавлена',
       NotificationType.Success,
     ));
+    if (payload.uri) {
+      yield put(locationActions.redirect(payload.uri));
+    }
   } catch (error) {
     yield put(setError(error));
     yield put(notificationActions.showMessage(

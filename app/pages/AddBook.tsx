@@ -191,7 +191,7 @@ class AddBook extends PureComponent<IProps, IState> {
 
   private handleClickAdd = () => {
     const { addBook, match } = this.props;
-    addBook(this.state.values, match.params.id);
+    addBook(this.state.values, match.params.id, '/');
   }
 }
 
