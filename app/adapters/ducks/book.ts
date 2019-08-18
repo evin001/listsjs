@@ -80,8 +80,6 @@ export const bookReducer: Reducer<IBookState, IBookAction> = (state = initialBoo
 
 // Selectors
 export const rootSelector = (state: any) => state.book;
-export const bookListSelector = (state: IBookState) => state.books;
-export const bookSelector = (state: IBookState) => state.book;
 
 // Actions Creators
 function addBookAction(book: IBook, id?: string, uri?: string) {

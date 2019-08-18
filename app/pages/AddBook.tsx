@@ -8,12 +8,13 @@ import Select from '@material-ui/core/Select';
 import { createStyles, Theme, WithStyles, withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { KeyboardDatePicker , MuiPickersUtilsProvider } from '@material-ui/pickers';
+import clsx from 'clsx';
 import ruLocale from 'date-fns/locale/ru';
 import { Book } from 'lists-core/domain';
 import { BaseType, baseTypeList } from 'lists-core/domain/Book';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { bookActions, bookSelector, IBookActions, ILocationActions, locationActions } from '~/adapters';
+import { bookActions, IBookActions, ILocationActions, locationActions } from '~/adapters';
 import { IStateType } from '~/frameworks';
 
 interface ICommonProps {}
@@ -49,6 +50,9 @@ const styles = (theme: Theme) => createStyles({
   formControl: {
     margin: theme.spacing(2, 0, 1),
     minWidth: 238,
+  },
+  button: {
+    marginTop: theme.spacing(2),
   },
   cancel: {
     marginLeft: theme.spacing(2),
@@ -169,6 +173,7 @@ class AddBook extends PureComponent<IProps, IState> {
           </FormControl>
         </Box>
         <Button
+          className={classes.button}
           disabled={values.isError}
           variant="contained"
           color="primary"
@@ -176,7 +181,12 @@ class AddBook extends PureComponent<IProps, IState> {
         >
           {match.params.id ? 'Обновить' : 'Добавить'}
         </Button>
-        <Button className={classes.cancel} onClick={this.handleCancel}>Отменить</Button>
+        <Button
+          className={clsx(classes.button, classes.cancel)}
+          onClick={this.handleCancel}
+        >
+          Отменить
+        </Button>
       </form>
     );
   }
@@ -212,7 +222,7 @@ class AddBook extends PureComponent<IProps, IState> {
 }
 
 const mapStateToProps = (state: IStateType): IMapStateToProps => ({
-  book: bookSelector(state.book),
+  book: state.book.book,
 });
 
 export default connect(mapStateToProps, {

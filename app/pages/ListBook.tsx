@@ -15,7 +15,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { assign, EventObject, interpret, Machine, State } from 'xstate';
 import {
-  bookActions, bookListSelector, BooksType,
+  bookActions, BooksType,
   FilterType, IBookActions,
   ILocationActions, locationActions,
 } from '~/adapters';
@@ -109,7 +109,7 @@ const styles = (theme: Theme) => createStyles({
     alignItems: 'center',
   },
   addBook: {
-    marginTop: theme.spacing(1),
+    marginTop: theme.spacing(2),
   },
 });
 
@@ -171,7 +171,7 @@ class ListBook extends PureComponent<IProps, IState> {
         {!isLoading && (
           <Grid container spacing={2}>
             {listBooks && listBooks.map(((value, key) => (
-              <Grid item xs={4} key={key}>
+              <Grid item xs={6} key={key}>
                 <Card>
                   <CardContent>
                     <Typography variant="h6" component="h2">{value.name}</Typography>
@@ -229,7 +229,7 @@ class ListBook extends PureComponent<IProps, IState> {
 }
 
 const mapStateToProps = (state: IStateType): IMapStateToProps => ({
-  books: bookListSelector(state.book),
+  books: state.book.books,
   done: state.book.done,
   isLoading: state.loader.isLoading,
 });
