@@ -1,3 +1,4 @@
-export { IDataStoreProvider } from './boundaries/IDataStoreProvider';
-export { IBookProvider } from './boundaries/IBookProvider';
-export { IUserProvider } from './boundaries/IUserProvider';
+export * from './boundaries/IDataStoreProvider';
+export * from './boundaries/IBookProvider';
+export * from './boundaries/IUserProvider';
+export * from './boundaries/IBookListProvider';

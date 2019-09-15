@@ -1,2 +1,3 @@
-export { AddBookInteractor } from './useCases/AddBookInteractor';
-export { AuthUserInteractor } from './useCases/AuthUserInteractor';
+export * from './useCases/AddBookInteractor';
+export * from './useCases/AuthUserInteractor';
+export * from './useCases/BookListInteractor';
