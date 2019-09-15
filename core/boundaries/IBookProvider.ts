@@ -1,8 +1,8 @@
-import { BaseType } from 'lists-core/domain/Book';
+import { BaseListType } from 'lists-core/domain';
 import { Book } from '../domain';
 
 export interface IBookProvider {
   addBook(book: Book, id?: string): Promise<any>;
-  listBook(cursor: any, type?: BaseType, limit?: number): Promise<any>;
+  listBook(cursor: any, type?: BaseListType, limit?: number): Promise<any>;
   getBookById(id: string): Promise<any>;
 }

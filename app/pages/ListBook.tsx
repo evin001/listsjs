@@ -9,7 +9,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import NavigateBefore from '@material-ui/icons/NavigateBefore';
 import NavigateNext from '@material-ui/icons/NavigateNext';
-import { BaseType } from 'lists-core/domain/Book';
+import { BaseListType } from 'lists-core/domain';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -206,7 +206,7 @@ class ListBook extends PureComponent<IProps, IState> {
     this.props.redirect(uri);
   }
 
-  private handleChangeType = (value?: BaseType | null, reset?: boolean) => {
+  private handleChangeType = (value?: BaseListType | null, reset?: boolean) => {
     this.service.send([
       'RESET',
       { type: 'FILTER', value: value || null, callback: (type: FilterType) => {

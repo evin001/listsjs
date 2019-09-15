@@ -1,10 +1,10 @@
 import { IBookProvider } from 'lists-core/boundaries/IBookProvider';
-import { BaseType } from 'lists-core/domain/Book';
+import { BaseListType } from 'lists-core/domain';
 
 export class ListBookInteractor {
   constructor(private provider: IBookProvider) {}
 
-  public listBook(cursor: any, type?: BaseType): Promise<any> {
+  public listBook(cursor: any, type?: BaseListType): Promise<any> {
     return this.provider.listBook(cursor, type);
   }
 

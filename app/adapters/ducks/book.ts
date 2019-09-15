@@ -1,6 +1,6 @@
 import firebase from 'firebase/app';
 import { Map, OrderedMap } from 'immutable';
-import { BaseType, Book, IBook } from 'lists-core/domain/Book';
+import { BaseListType, Book, IBook } from 'lists-core/domain';
 import { AddBookInteractor } from 'lists-core/useCases/AddBookInteractor';
 import { ListBookInteractor } from 'lists-core/useCases/ListBookInteractor';
 import { Reducer } from 'redux';
@@ -40,7 +40,7 @@ export const initialBookState: IBookState = {
   done: false,
 };
 
-export type FilterType  = BaseType | null;
+export type FilterType  = BaseListType | null;
 
 export interface IBookAction {
   type: string;

@@ -10,8 +10,7 @@ import TextField from '@material-ui/core/TextField';
 import { KeyboardDatePicker , MuiPickersUtilsProvider } from '@material-ui/pickers';
 import clsx from 'clsx';
 import ruLocale from 'date-fns/locale/ru';
-import { Book } from 'lists-core/domain';
-import { BaseType, baseTypeList } from 'lists-core/domain/Book';
+import { BaseListType, baseTypeList, Book } from 'lists-core/domain';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { bookActions, IBookActions, ILocationActions, locationActions } from '~/adapters';
@@ -25,7 +24,7 @@ interface IBookState {
   name: string;
   description: string;
   doneDate?: Date | null;
-  type: BaseType;
+  type: BaseListType;
 }
 
 interface IMapStateToProps {
@@ -36,7 +35,7 @@ interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActio
   match: {
     params: {
       id?: string,
-      type?: BaseType,
+      type?: BaseListType,
     },
   };
 }
@@ -75,7 +74,7 @@ class AddBook extends PureComponent<IProps, IState> {
 
     if (match.params.type) {
       const cloneBook = Book.clone(this.state.values);
-      cloneBook.type = match.params.type as BaseType;
+      cloneBook.type = match.params.type as BaseListType;
       this.setState({ values: cloneBook });
     }
   }
@@ -145,7 +144,7 @@ class AddBook extends PureComponent<IProps, IState> {
             {...commonProps}
           />
         </Box>
-        {values.type === BaseType.Done && (
+        {values.type === BaseListType.Done && (
           <Box>
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ruLocale}>
               <KeyboardDatePicker
@@ -205,7 +204,7 @@ class AddBook extends PureComponent<IProps, IState> {
 
   private handleChangeSelect = (event: React.ChangeEvent<{ name?: string, value: unknown }>) => {
     const cloneBook = Book.clone(this.state.values);
-    cloneBook.type = event.target.value as BaseType;
+    cloneBook.type = event.target.value as BaseListType;
     this.setState({ values: cloneBook });
   }
 

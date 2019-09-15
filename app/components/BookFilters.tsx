@@ -1,6 +1,6 @@
 import { makeStyles, Theme } from '@material-ui/core';
 import Chip from '@material-ui/core/Chip';
-import { BaseType, baseTypeList } from 'lists-core/domain/Book';
+import { BaseListType, baseTypeList } from 'lists-core/domain';
 import React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -14,14 +14,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface IProps {
-  type: BaseType | null;
-  onChangeType: (type: BaseType) => void;
+  type: BaseListType | null;
+  onChangeType: (type: BaseListType) => void;
 }
 
 const BookFilters = ({ type, onChangeType }: IProps) => {
   const classes = useStyles();
 
-  function handleClick(value: BaseType) {
+  function handleClick(value: BaseListType) {
     return () => {
       onChangeType(value);
     };
