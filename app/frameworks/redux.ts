@@ -4,15 +4,17 @@ import createSagaMiddleware from 'redux-saga';
 import {
   bookReducer, IBookState,
   ILoaderState, INotificationState,
+  IUserState,
   loaderReducer,
-  notificationReducer,
-  rootSaga, routerReducer,
+  notificationReducer, rootSaga,
+  routerReducer, userReducer,
 } from '~/adapters';
 
 export interface IStateType {
   book: IBookState;
   notification: INotificationState;
   loader: ILoaderState;
+  user: IUserState;
 }
 
 const rootReducer = {
@@ -20,6 +22,7 @@ const rootReducer = {
   notification: notificationReducer,
   router: routerReducer,
   loader: loaderReducer,
+  user: userReducer,
 };
 
 export const configureStore = () => {

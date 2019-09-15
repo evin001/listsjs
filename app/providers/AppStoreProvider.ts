@@ -1,4 +1,5 @@
-import firebase from 'firebase/app';
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
 import 'firebase/firestore';
 import { IDataStoreProvider } from 'lists-core/boundaries/IDataStoreProvider';
 import { apiKey, projectId } from '~/frameworks';
@@ -10,6 +11,7 @@ export class AppStoreProvider implements IDataStoreProvider {
     }
     return AppStoreProvider.instance;
   }
+
   private static instance: AppStoreProvider;
   private static store: firebase.firestore.Firestore;
 
