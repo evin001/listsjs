@@ -15,9 +15,9 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { assign, EventObject, interpret, Machine, State } from 'xstate';
 import {
-  bookActions, bookListActions,
-  BooksType, FilterType,
-  IBookActions, IBookListActions,
+  bookListActions,
+  BookListType, FilterType,
+  IBookListActions,
   ILocationActions, locationActions, UserRefType,
 } from '~/adapters';
 import BookFilters from '~/components/BookFilters';
@@ -26,12 +26,12 @@ import { IStateType } from '~/frameworks';
 interface IMapStateToProps {
   done: boolean;
   isLoading: boolean;
-  books: BooksType;
+  bookList: BookListType;
   filterType?: FilterType;
   userRef: UserRefType;
 }
 
-interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActions, IBookListActions, ILocationActions {}
+interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookListActions, ILocationActions {}
 
 interface IState {
   current: State<IPageContext, PageEvent>;
@@ -133,10 +133,10 @@ class ListBook extends PureComponent<IProps, IState> {
   }
 
   public componentDidUpdate() {
-    const { done, books } = this.props;
+    const { done, bookList } = this.props;
     const { current } = this.state;
-    if (done && books.size === current.context.page) {
-      this.service.send('OFFSET', { value: books.size });
+    if (done && bookList.size === current.context.page) {
+      this.service.send('OFFSET', { value: bookList.size });
     }
   }
 
@@ -145,10 +145,10 @@ class ListBook extends PureComponent<IProps, IState> {
   }
 
   public render() {
-    const { books, done, isLoading, classes } = this.props;
+    const { bookList, done, isLoading, classes } = this.props;
     const { current } = this.state;
     const { page, type } = current.context;
-    const listBooks = books.get(page);
+    const listBooks = bookList.get(page);
 
     return (
       <Box my={1}>
@@ -164,7 +164,7 @@ class ListBook extends PureComponent<IProps, IState> {
             </IconButton>
             <IconButton
               onClick={this.handleClickNextPage}
-              disabled={done && page + 1 === books.size}
+              disabled={done && page + 1 === bookList.size}
             >
               <NavigateNext />
             </IconButton>
@@ -177,9 +177,9 @@ class ListBook extends PureComponent<IProps, IState> {
               <Grid item xs={6} key={key}>
                 <Card>
                   <CardContent>
-                    <Typography variant="h6" component="h2">{value.name}</Typography>
-                    <Typography color="textSecondary">{value.author}</Typography>
-                    <Typography variant="body2" component="p">{value.shortDescription}</Typography>
+                    <Typography variant="h6" component="h2">{value.book.name}</Typography>
+                    <Typography color="textSecondary">{value.book.author}</Typography>
+                    <Typography variant="body2" component="p">{value.book.shortDescription}</Typography>
                   </CardContent>
                   <CardActions>
                     <Button size="small" component={Link} to={`/add-book/${key}`}>Подробнее</Button>
@@ -213,7 +213,6 @@ class ListBook extends PureComponent<IProps, IState> {
       'RESET',
       { type: 'FILTER', value: value || null, callback: (type: FilterType) => {
           this.props.getBookList(this.props.userRef, type, reset);
-          this.props.getListBook(type, reset);
         } },
     ]);
   }
@@ -223,25 +222,24 @@ class ListBook extends PureComponent<IProps, IState> {
   }
 
   private handleClickNextPage = () => {
-    const { books, done } = this.props;
+    const { bookList, done, userRef } = this.props;
     const { current } = this.state;
-    if (!(done || books.get(current.context.page + 1))) {
-      this.props.getListBook(current.context.type);
+    if (!(done || bookList.get(current.context.page + 1))) {
+      this.props.getBookList(userRef, current.context.type);
     }
     this.service.send('INC');
   }
 }
 
 const mapStateToProps = (state: IStateType): IMapStateToProps => ({
-  books: state.book.books,
-  done: state.book.done,
+  bookList: state.bookList.bookList,
+  done: state.bookList.done,
+  filterType: state.bookList.filterType,
   isLoading: state.loader.isLoading,
-  filterType: state.book.filterType,
   userRef: state.user.userRef,
 });
 
 export default connect(mapStateToProps, {
-  ...bookActions,
   ...locationActions,
   ...bookListActions,
 })(withStyles(styles)(ListBook));

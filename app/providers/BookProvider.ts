@@ -3,23 +3,10 @@ import { OrderedMap } from 'immutable';
 import { IBookProvider } from 'lists-core/boundaries/IBookProvider';
 import { BaseListType, Book, IBook } from 'lists-core/domain';
 import { AppStoreProvider } from './AppStoreProvider';
+import { docToBook } from './utils';
 
 export class BookProvider implements IBookProvider {
   private static collection = 'books';
-
-  private static docToBook(data: firebase.firestore.DocumentData): Book {
-    const book = new Book();
-    book.author = data.author;
-    book.description = data.description;
-    book.name = data.name;
-    book.readingTarget = data.readingTarget;
-    book.type = data.type;
-    if (data.cover) { book.cover = data.cover; }
-    if (data.doneDate instanceof firebase.firestore.Timestamp) {
-      book.doneDate = data.doneDate.toDate();
-    }
-    return book;
-  }
 
   private static bookToDoc(book: Book) {
     return {
@@ -58,7 +45,7 @@ export class BookProvider implements IBookProvider {
     let collections: OrderedMap<string, IBook> = OrderedMap();
 
     books.forEach((doc) => {
-      const book = BookProvider.docToBook(doc.data());
+      const book = docToBook(doc.data());
       collections = collections.set(doc.id, book);
     });
 
@@ -73,7 +60,7 @@ export class BookProvider implements IBookProvider {
     if (book.exists) {
       const data = book.data();
       if (data) {
-        return BookProvider.docToBook(data);
+        return docToBook(data);
       }
     }
     return null;

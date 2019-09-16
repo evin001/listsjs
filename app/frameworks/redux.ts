@@ -2,16 +2,18 @@ import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { createLogger } from 'redux-logger';
 import createSagaMiddleware from 'redux-saga';
 import {
-  bookReducer, IBookState,
-  ILoaderState, INotificationState,
-  IUserState,
-  loaderReducer,
+  bookListReducer, bookReducer,
+  IBookListState, IBookState,
+  ILoaderState,
+  INotificationState,
+  IUserState, loaderReducer,
   notificationReducer, rootSaga,
   routerReducer, userReducer,
 } from '~/adapters';
 
 export interface IStateType {
   book: IBookState;
+  bookList: IBookListState;
   notification: INotificationState;
   loader: ILoaderState;
   user: IUserState;
@@ -19,6 +21,7 @@ export interface IStateType {
 
 const rootReducer = {
   book: bookReducer,
+  bookList: bookListReducer,
   notification: notificationReducer,
   router: routerReducer,
   loader: loaderReducer,

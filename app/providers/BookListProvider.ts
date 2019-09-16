@@ -1,7 +1,9 @@
 import firebase from 'firebase/app';
+import { OrderedMap } from 'immutable';
 import { IBookListProvider } from 'lists-core/boundaries';
-import { BaseListType } from 'lists-core/domain/BookList';
+import { BaseListType, IBookList } from 'lists-core/domain/BookList';
 import { AppStoreProvider } from '~/providers/AppStoreProvider';
+import { docToBookList } from './utils';
 
 export class BookListProvider implements IBookListProvider {
 
@@ -15,7 +17,7 @@ export class BookListProvider implements IBookListProvider {
     cursor: any,
     type?: BaseListType,
     limit: number = 2,
-  ): Promise<any> {
+  ): Promise<[OrderedMap<string, IBookList> | null, any]> {
 
     let request = await this.store.collection(BookListProvider.collection)
       .where('userId', '==', userRef)
@@ -24,13 +26,20 @@ export class BookListProvider implements IBookListProvider {
     if (cursor) { request = request.startAfter(cursor); }
     const books: firebase.firestore.QuerySnapshot = await request.get();
 
-    books.forEach(async (doc) => {
-      doc.data().bookId.get().then((snapshot: firebase.firestore.DocumentSnapshot) => {
-        console.log(snapshot);
-      });
-    });
+    let collections: OrderedMap<string, IBookList> = OrderedMap();
 
-    return undefined;
+    for (let i = 0; i < books.size; i++) {
+      const doc = books.docs[i];
+      const bookDoc: firebase.firestore.DocumentSnapshot = await doc.data().bookId.get();
+      if (bookDoc.exists) {
+        const bookList = docToBookList(doc.data(), bookDoc.data());
+        collections = collections.set(doc.id, bookList);
+      }
+    }
+
+    const last = books.docs[books.docs.length - 1] || null;
+
+    return [collections, last];
   }
 
 }
