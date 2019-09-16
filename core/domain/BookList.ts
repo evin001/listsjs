@@ -22,8 +22,7 @@ export interface IBookList {
   type: BaseListType;
 }
 
-export class BookList {
-
+export class BookList implements IBookList {
   get type(): BaseListType {
     return this._type;
   }

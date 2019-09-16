@@ -1,4 +1,5 @@
-import { IUser, User } from 'lists-core/domain/User';
+import firebase from 'firebase/app';
+import { IUser } from 'lists-core/domain/User';
 import { AuthUserInteractor } from 'lists-core/useCases';
 import { Reducer } from 'redux';
 import { all, call, put, takeEvery } from 'redux-saga/effects';
@@ -12,8 +13,10 @@ import { appName, moduleName } from '../constants';
 export const SIGN_IN_USER_REQUEST = `${appName}/${moduleName}/SIGN_IN_USER_REQUEST`;
 export const SIGN_IN_USER_SUCCESS = `${appName}/${moduleName}/SIGN_IN_USER_SUCCESS`;
 
+export type UserRefType = firebase.firestore.DocumentReference | null;
+
 export interface IUserState {
-  user: IUser;
+  userRef: UserRefType;
 }
 
 export interface IUserAction {
@@ -23,18 +26,16 @@ export interface IUserAction {
 
 // Tested user
 export const initialUserState: IUserState = {
-  user: new User(),
+  userRef: null,
 };
 
 // Reducer
 export const userReducer: Reducer<IUserState, IUserAction> = (state = initialUserState, action) => {
   switch (action.type) {
     case SIGN_IN_USER_SUCCESS:
-      const user = state.user;
-      user.id = action.payload;
       return {
         ...state,
-        user,
+        userRef: action.payload,
       };
     default:
       return state;
@@ -51,10 +52,10 @@ function singInAction(user: IUser) {
   };
 }
 
-function signInSuccess(userId: string) {
+function signInSuccess(userRef: UserRefType) {
   return {
     type: SIGN_IN_USER_SUCCESS,
-    payload: userId,
+    payload: userRef,
   };
 }
 
@@ -73,8 +74,8 @@ function* signInSaga(action: IUserAction) {
     yield put(loaderActions.loading());
     const proivider = new AuthProvider();
     const interactor = new AuthUserInteractor(proivider);
-    const userId = yield call([interactor, interactor.signIn], payload);
-    yield put(signInSuccess(userId));
+    const userRef = yield call([interactor, interactor.signIn], payload);
+    yield put(signInSuccess(userRef));
   } catch (error) {
     yield put(errorActions.handle(error));
     yield put(notificationActions.showMessage(

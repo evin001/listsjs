@@ -15,9 +15,10 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { assign, EventObject, interpret, Machine, State } from 'xstate';
 import {
-  bookActions, BooksType,
-  FilterType, IBookActions,
-  ILocationActions, locationActions,
+  bookActions, bookListActions,
+  BooksType, FilterType,
+  IBookActions, IBookListActions,
+  ILocationActions, locationActions, UserRefType,
 } from '~/adapters';
 import BookFilters from '~/components/BookFilters';
 import { IStateType } from '~/frameworks';
@@ -27,9 +28,10 @@ interface IMapStateToProps {
   isLoading: boolean;
   books: BooksType;
   filterType?: FilterType;
+  userRef: UserRefType;
 }
 
-interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActions, ILocationActions {}
+interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActions, IBookListActions, ILocationActions {}
 
 interface IState {
   current: State<IPageContext, PageEvent>;
@@ -210,6 +212,7 @@ class ListBook extends PureComponent<IProps, IState> {
     this.service.send([
       'RESET',
       { type: 'FILTER', value: value || null, callback: (type: FilterType) => {
+          this.props.getBookList(this.props.userRef, type, reset);
           this.props.getListBook(type, reset);
         } },
     ]);
@@ -234,9 +237,11 @@ const mapStateToProps = (state: IStateType): IMapStateToProps => ({
   done: state.book.done,
   isLoading: state.loader.isLoading,
   filterType: state.book.filterType,
+  userRef: state.user.userRef,
 });
 
 export default connect(mapStateToProps, {
   ...bookActions,
   ...locationActions,
+  ...bookListActions,
 })(withStyles(styles)(ListBook));

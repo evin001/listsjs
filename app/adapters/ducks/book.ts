@@ -1,8 +1,7 @@
 import firebase from 'firebase/app';
 import { Map, OrderedMap } from 'immutable';
 import { BaseListType, Book, IBook } from 'lists-core/domain';
-import { AddBookInteractor } from 'lists-core/useCases/AddBookInteractor';
-import { ListBookInteractor } from 'lists-core/useCases/ListBookInteractor';
+import { AddBookInteractor, ListBookInteractor } from 'lists-core/useCases';
 import { Reducer } from 'redux';
 import { all, call, put, select, takeEvery } from 'redux-saga/effects';
 import { BookProvider } from '~/providers';

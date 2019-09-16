@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import { User } from 'lists-core/domain/User';
 import React, { Fragment, PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { IUserActions, userActions } from '~/adapters';
+import { IUserActions, userActions, UserRefType } from '~/adapters';
 import { IStateType } from '~/frameworks';
 import BaseRouter from './BaseRouter';
 import Header from './Header';
@@ -20,7 +20,7 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface IMapStateToProps {
-  userId?: string;
+  userRef: UserRefType;
 }
 
 interface IProps extends WithStyles<typeof styles>, IUserActions, IMapStateToProps {}
@@ -34,7 +34,7 @@ class AppWrapper extends PureComponent<IProps> {
   }
 
   public render() {
-    const { classes, userId } = this.props;
+    const { classes, userRef } = this.props;
     return (
       <Fragment>
         <CssBaseline />
@@ -42,7 +42,7 @@ class AppWrapper extends PureComponent<IProps> {
           <Header />
           <Loader />
           <Notification />
-          {userId ? <BaseRouter /> : (
+          {userRef !== null ? <BaseRouter /> : (
             <Box textAlign="center" m={2}>
               <Typography>Инициализация...</Typography>
             </Box>
@@ -54,7 +54,7 @@ class AppWrapper extends PureComponent<IProps> {
 }
 
 const mapStateToProps = (state: IStateType): IMapStateToProps => ({
-  userId: state.user.user.id,
+  userRef: state.user.userRef,
 });
 
 export default connect(mapStateToProps, {

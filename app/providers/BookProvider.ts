@@ -50,13 +50,6 @@ export class BookProvider implements IBookProvider {
     limit: number = 2,
   ): Promise<[OrderedMap<string, IBook> | null, any]> {
 
-    const res: firebase.firestore.QuerySnapshot =
-      await this.store.collection('lists').limit(limit).get();
-    res.forEach(async (doc) => {
-      const bookRes = await doc.data().bookId.get();
-      console.log(bookRes.data());
-    });
-
     let request = this.store.collection(BookProvider.collection).limit(limit);
     if (type) { request = request.where('type', '==', type); }
     if (cursor) { request = request.startAfter(cursor); }

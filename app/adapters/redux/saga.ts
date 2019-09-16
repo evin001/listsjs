@@ -1,5 +1,5 @@
 import { all } from 'redux-saga/effects';
-import { bookSaga, errorSaga, locationSaga, userSage } from '../ducks';
+import { bookListSaga, bookSaga, errorSaga, locationSaga, userSage } from '../ducks';
 
 export function* rootSaga() {
   yield all([
@@ -7,5 +7,6 @@ export function* rootSaga() {
     locationSaga(),
     errorSaga(),
     userSage(),
+    bookListSaga(),
   ]);
 }
