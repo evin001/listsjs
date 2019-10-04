@@ -7,13 +7,13 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import { createStyles, Theme, WithStyles, withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { KeyboardDatePicker , MuiPickersUtilsProvider } from '@material-ui/pickers';
+import { DatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import clsx from 'clsx';
 import ruLocale from 'date-fns/locale/ru';
-import { BaseListType, baseTypeList, Book } from 'lists-core/domain';
+import { BaseListType, baseTypeList, Book, BookList } from 'lists-core/domain';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { bookActions, IBookActions, ILocationActions, locationActions } from '~/adapters';
+import { bookListActions, IBookListActions, ILocationActions, locationActions } from '~/adapters';
 import { IStateType } from '~/frameworks';
 
 interface ICommonProps {}
@@ -28,10 +28,10 @@ interface IBookState {
 }
 
 interface IMapStateToProps {
-  book?: Book;
+  bookFromList: BookList | null;
 }
 
-interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActions, ILocationActions {
+interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookListActions, ILocationActions {
   match: {
     params: {
       id?: string,
@@ -41,7 +41,7 @@ interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookActio
 }
 
 interface IState {
-  values: Book;
+  values: BookList;
   isUpdateFromProps: boolean;
 }
 
@@ -61,30 +61,30 @@ const styles = (theme: Theme) => createStyles({
 class AddBook extends PureComponent<IProps, IState> {
 
   public state = {
-    values: new Book(),
+    values: new BookList(),
     isUpdateFromProps: false,
   };
 
   public componentDidMount() {
-    const { match, getBook } = this.props;
+    const { match, getBookById } = this.props;
 
     if (match.params.id) {
-      getBook(match.params.id);
+      getBookById(match.params.id);
     }
 
     if (match.params.type) {
-      const cloneBook = Book.clone(this.state.values);
+      const cloneBook = BookList.clone(this.state.values);
       cloneBook.type = match.params.type as BaseListType;
       this.setState({ values: cloneBook });
     }
   }
 
   public componentDidUpdate() {
-    const { book } = this.props;
+    const { bookFromList } = this.props;
     const { isUpdateFromProps } = this.state;
-    if (book && !isUpdateFromProps) {
+    if (bookFromList && !isUpdateFromProps) {
       this.setState({
-        values: Book.clone(book),
+        values: BookList.clone(bookFromList),
         isUpdateFromProps: true,
       });
     }
@@ -112,42 +112,42 @@ class AddBook extends PureComponent<IProps, IState> {
         <Box>
           <TextField
             required
-            error={values.isErrorAuthor}
+            error={values.book.isErrorAuthor}
             label="Автор"
-            value={values.author}
+            value={values.book.author}
             onChange={this.handleChangeInput('author')}
-            helperText={`${values.author && values.author.length || 0}/${Book.authorMaxLength}`}
+            helperText={`${values.book.author && values.book.author.length || 0}/${Book.authorMaxLength}`}
             {...commonProps}
           />
         </Box>
         <Box>
           <TextField
             required
-            error={values.isErrorName}
+            error={values.book.isErrorName}
             label="Название"
-            value={values.name}
+            value={values.book.name}
             onChange={this.handleChangeInput('name')}
-            helperText={`${values.name && values.name.length || 0}/${Book.nameMaxLength}`}
+            helperText={`${values.book.name && values.book.name.length || 0}/${Book.nameMaxLength}`}
             {...commonProps}
           />
         </Box>
         <Box>
           <TextField
             required
-            error={values.isErrorDescription}
+            error={values.book.isErrorDescription}
             label="Описание"
-            value={values.description}
+            value={values.book.description}
             onChange={this.handleChangeInput('description')}
             multiline={true}
             rowsMax="10"
-            helperText={`${values.description && values.description.length || 0}/${Book.descriptionMaxLength}`}
+            helperText={`${values.book.description && values.book.description.length || 0}/${Book.descriptionMaxLength}`}
             {...commonProps}
           />
         </Box>
         {values.type === BaseListType.Done && (
           <Box>
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ruLocale}>
-              <KeyboardDatePicker
+              <DatePicker
                 margin="normal"
                 label="Дата прочтения"
                 format="dd.MM.yyyy"
@@ -173,7 +173,7 @@ class AddBook extends PureComponent<IProps, IState> {
         </Box>
         <Button
           className={classes.button}
-          disabled={values.isError}
+          disabled={values.book.isError}
           variant="contained"
           color="primary"
           onClick={this.handleClickAdd}
@@ -196,20 +196,20 @@ class AddBook extends PureComponent<IProps, IState> {
 
   private handleChangeInput = (name: keyof IBookState) => {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
-      const cloneBook = Book.clone(this.state.values);
-      (cloneBook[name] as string) = event.target.value;
+      const cloneBook = BookList.clone(this.state.values);
+      (cloneBook.book[name] as string) = event.target.value;
       this.setState({ values: cloneBook });
     };
   }
 
   private handleChangeSelect = (event: React.ChangeEvent<{ name?: string, value: unknown }>) => {
-    const cloneBook = Book.clone(this.state.values);
+    const cloneBook = BookList.clone(this.state.values);
     cloneBook.type = event.target.value as BaseListType;
     this.setState({ values: cloneBook });
   }
 
   private handleChangeDate = (date: Date | null) => {
-    const cloneBook = Book.clone(this.state.values);
+    const cloneBook = BookList.clone(this.state.values);
     cloneBook.doneDate = date;
     this.setState({ values: cloneBook });
   }
@@ -221,10 +221,10 @@ class AddBook extends PureComponent<IProps, IState> {
 }
 
 const mapStateToProps = (state: IStateType): IMapStateToProps => ({
-  book: state.book.book,
+  bookFromList: state.bookList.book,
 });
 
 export default connect(mapStateToProps, {
-  ...bookActions,
+  ...bookListActions,
   ...locationActions,
 })(withStyles(styles)(AddBook));

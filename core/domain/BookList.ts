@@ -1,3 +1,5 @@
+import { Book } from 'lists-core/domain/Book';
+
 export enum BaseListType {
   Done = 'done',
   InProcess = 'in-process',
@@ -16,7 +18,7 @@ export const baseTypeList: IBaseTypeList[] = [
 ];
 
 export interface IBookList {
-  book: any;
+  book: Book;
   doneDate?: Date | null;
   readingTarget: string;
   type: BaseListType;
@@ -42,7 +44,18 @@ export class BookList implements IBookList {
 
   public static readingTargetMaxLength = 250;
 
-  public book: any;
+  public static clone(bookList: BookList): BookList {
+    const clone = new BookList();
+
+    clone.book = Book.clone(bookList.book);
+    clone.type = bookList.type;
+    clone.doneDate = bookList.doneDate;
+    clone.readingTarget = bookList.readingTarget;
+
+    return clone;
+  }
+
+  public book: Book = new Book();
   public doneDate?: Date | null;
 
   private _readingTarget: string = '';

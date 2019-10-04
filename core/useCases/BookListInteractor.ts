@@ -7,4 +7,8 @@ export class BookListInteractor implements IBookListProvider {
   public listBook(userId: string, cursor: any, type?: BaseListType): Promise<any> {
     return this.provider.listBook(userId, cursor, type);
   }
+
+  public getBookById(id: string): Promise<any> {
+    return this.provider.getBookById(id);
+  }
 }

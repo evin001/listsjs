@@ -1,7 +1,7 @@
 import firebase from 'firebase/app';
 import { OrderedMap } from 'immutable';
 import { IBookListProvider } from 'lists-core/boundaries';
-import { BaseListType, IBookList } from 'lists-core/domain/BookList';
+import { BaseListType, BookList, IBookList } from 'lists-core/domain/BookList';
 import { AppStoreProvider } from '~/providers/AppStoreProvider';
 import { docToBookList } from './utils';
 
@@ -42,4 +42,18 @@ export class BookListProvider implements IBookListProvider {
     return [collections, last];
   }
 
+  public async getBookById(id: string): Promise<BookList | null> {
+    const book: firebase.firestore.DocumentSnapshot =
+      await this.store.collection(BookListProvider.collection).doc(id).get();
+    if (book.exists) {
+      const data = book.data();
+      if (data) {
+        const bookDoc: firebase.firestore.DocumentSnapshot = await data.bookId.get();
+        if (bookDoc.exists) {
+          return docToBookList(data, bookDoc.data());
+        }
+      }
+    }
+    return null;
+  }
 }

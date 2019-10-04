@@ -90,9 +90,6 @@ export class Book implements IBook {
     const clone = new Book();
 
     clone.cover = book.cover;
-    clone.type = book.type;
-    clone.doneDate = book.doneDate;
-    clone.readingTarget = book.readingTarget;
 
     clone._author = book._author;
     clone._description = book._description;

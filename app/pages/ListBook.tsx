@@ -16,7 +16,7 @@ import { Link } from 'react-router-dom';
 import { assign, EventObject, interpret, Machine, State } from 'xstate';
 import {
   bookListActions,
-  BookListType, FilterType,
+  BookListFilterType, BookListType,
   IBookListActions,
   ILocationActions, locationActions, UserRefType,
 } from '~/adapters';
@@ -27,7 +27,7 @@ interface IMapStateToProps {
   done: boolean;
   isLoading: boolean;
   bookList: BookListType;
-  filterType?: FilterType;
+  filterType?: BookListFilterType;
   userRef: UserRefType;
 }
 
@@ -45,7 +45,7 @@ interface IPageStateSchema {
 
 interface IPageContext {
   page: number;
-  type: FilterType;
+  type: BookListFilterType;
 }
 
 type PageEvent =
@@ -53,7 +53,7 @@ type PageEvent =
   | { type: 'DEC' }
   | { type: 'OFFSET' }
   | { type: 'RESET' }
-  | { type: 'FILTER'; value: FilterType, callback: any };
+  | { type: 'FILTER'; value: BookListFilterType, callback: any };
 
 const increment = (context: IPageContext) => context.page + 1;
 const decrement = (context: IPageContext) => context.page - 1;
@@ -211,7 +211,7 @@ class ListBook extends PureComponent<IProps, IState> {
   private handleChangeType = (value?: BaseListType | null, reset?: boolean) => {
     this.service.send([
       'RESET',
-      { type: 'FILTER', value: value || null, callback: (type: FilterType) => {
+      { type: 'FILTER', value: value || null, callback: (type: BookListFilterType) => {
           this.props.getBookList(this.props.userRef, type, reset);
         } },
     ]);

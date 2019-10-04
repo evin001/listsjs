@@ -1,5 +1,5 @@
 import { Map, OrderedMap } from 'immutable';
-import { BaseListType, IBookList } from 'lists-core/domain';
+import { BaseListType, BookList, IBookList } from 'lists-core/domain';
 import { BookListInteractor } from 'lists-core/useCases';
 import { Reducer } from 'redux';
 import { all, call, put, select, takeEvery } from 'redux-saga/effects';
@@ -11,24 +11,25 @@ import { notificationActions, NotificationType } from './notification';
 
 // Types
 export type BookListFilterType  = BaseListType | null;
-export type FilterType  = BaseListType | null;
 export type BookListType = Map<number, OrderedMap<string, IBookList>>;
 
 // Interfaces
 export interface IBookListState {
   lastDoc: firebase.firestore.QueryDocumentSnapshot | null;
   done: boolean;
-  filterType?: FilterType;
+  filterType?: BookListFilterType;
   bookList: BookListType;
+  book: BookList | null;
 }
 
 export interface IBookListAction {
   type: string;
-  payload: FilterType & IBookListState;
+  payload: BookListFilterType & IBookListState & BookList;
 }
 
 export interface IBookListActions {
   getBookList: typeof getBookListAction;
+  getBookById: typeof getBookByIdAction;
 }
 
 // Actions
@@ -36,16 +37,20 @@ export const GET_BOOK_LIST_REQUEST = `${appName}/${moduleName}/GET_BOOK_LIST_REQ
 export const GET_BOOK_LIST_SUCCESS = `${appName}/${moduleName}/GET_BOOK_LIST_SUCCESS`;
 export const RESET_BOOK_LIST = `${appName}/${moduleName}/RESET_BOOK_LIST`;
 
+export const GET_BOOK_BY_ID_REQUEST = `${appName}/${moduleName}/GET_BOOK_BY_ID_REQUEST`;
+export const GET_BOOK_BY_ID_SUCCESS = `${appName}/${moduleName}/GET_BOOK_BY_ID_SUCCESS`;
+
 // Reducer
 export const initialBookListState: IBookListState = {
   lastDoc: null,
   done: false,
   bookList: Map(),
+  book: null,
 };
 
 export const bookListReducer: Reducer<IBookListState, IBookListAction> = (state = initialBookListState, action) => {
-  switch (action.type) {
-    case GET_BOOK_LIST_SUCCESS: {
+  if (action.type === GET_BOOK_LIST_SUCCESS) {
+    {
       return {
         ...state,
         done: action.payload.lastDoc === null,
@@ -55,16 +60,21 @@ export const bookListReducer: Reducer<IBookListState, IBookListAction> = (state 
         } : {}),
       };
     }
-    case RESET_BOOK_LIST:
-      return {
-        ...state,
-        lastDoc: null,
-        bookList: Map(),
-        done: false,
-        filterType: action.payload,
-      };
-    default:
-      return state;
+  } else if (action.type === RESET_BOOK_LIST) {
+    return {
+      ...state,
+      lastDoc: null,
+      bookList: Map(),
+      done: false,
+      filterType: action.payload,
+    };
+  } else if (action.type === GET_BOOK_BY_ID_SUCCESS) {
+    return {
+      ...state,
+      book: action.payload,
+    };
+  } else {
+    return state;
   }
 };
 
@@ -79,7 +89,7 @@ function getBookListAction(userRef: any, filter?: BookListFilterType, reset?: bo
   };
 }
 
-function resetBookListAction(type: FilterType) {
+function resetBookListAction(type: BookListFilterType) {
   return {
     type: RESET_BOOK_LIST,
     payload: type,
@@ -93,8 +103,24 @@ function getBookListSuccessAction(bookList: Map<string, IBookList> | null, lastD
   };
 }
 
+function getBookByIdAction(id: string) {
+  return {
+    type: GET_BOOK_BY_ID_REQUEST,
+    payload: id,
+  };
+}
+
+function getBookByIdSuccessAction(bookFromList: any) {
+  return {
+    type: GET_BOOK_BY_ID_SUCCESS,
+    payload: bookFromList,
+  };
+}
+
 export const bookListActions: IBookListActions = {
   getBookList: getBookListAction,
+  getBookById: getBookByIdAction,
+  // addBookToList: addBookToListAction,
 };
 
 // Sagas
@@ -130,8 +156,24 @@ function* getBookListSaga(action: any) {
   }
 }
 
+function* getBookByIdSaga(action: any) {
+  const { payload } = action;
+  try {
+    yield put(loaderActions.loading());
+    const provider = new BookListProvider();
+    const interactor = new BookListInteractor(provider);
+    const book = yield call([interactor, interactor.getBookById], payload);
+    yield put(getBookByIdSuccessAction(book));
+  } catch (error) {
+    yield put(errorActions.handle(error));
+  } finally {
+    yield put(loaderActions.loaded());
+  }
+}
+
 export function* bookListSaga() {
   yield all([
     takeEvery(GET_BOOK_LIST_REQUEST, getBookListSaga),
+    takeEvery(GET_BOOK_BY_ID_REQUEST, getBookByIdSaga),
   ]);
 }
