@@ -81,9 +81,9 @@ class AddBook extends PureComponent<IProps, IState> {
   }
 
   public componentDidUpdate() {
-    const { bookFromList } = this.props;
+    const { bookFromList, match } = this.props;
     const { isUpdateFromProps } = this.state;
-    if (bookFromList && !isUpdateFromProps) {
+    if (match.params.id && bookFromList && !isUpdateFromProps) {
       this.setState({
         values: BookList.clone(bookFromList),
         isUpdateFromProps: true,
