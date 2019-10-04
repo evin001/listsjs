@@ -42,6 +42,11 @@ export class BookList implements IBookList {
     this._readingTarget = value.substr(0, BookList.readingTargetMaxLength);
   }
 
+  get isError(): boolean {
+    return this.book.isError ||
+      this.doneDate instanceof Date && isNaN(this.doneDate.getTime());
+  }
+
   public static readingTargetMaxLength = 250;
 
   public static clone(bookList: BookList): BookList {

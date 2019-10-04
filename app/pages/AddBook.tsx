@@ -18,13 +18,14 @@ import { IStateType } from '~/frameworks';
 
 interface ICommonProps {}
 
-interface IBookState {
-  readingTarget?: string;
+interface IBookInputProps {
   author: string;
   name: string;
   description: string;
-  doneDate?: Date | null;
-  type: BaseListType;
+}
+
+interface IBookListInputProps {
+  readingTarget: string;
 }
 
 interface IMapStateToProps {
@@ -104,8 +105,8 @@ class AddBook extends PureComponent<IProps, IState> {
           <TextField
             label="Цель прочтения"
             value={values.readingTarget}
-            onChange={this.handleChangeInput('readingTarget')}
-            helperText={`${values.readingTarget && values.readingTarget.length || 0}/${Book.readingTargetMaxLength}`}
+            onChange={this.handleChangeBookListInput('readingTarget')}
+            helperText={`${values.readingTarget && values.readingTarget.length || 0}/${BookList.readingTargetMaxLength}`}
             {...commonProps}
           />
         </Box>
@@ -115,7 +116,7 @@ class AddBook extends PureComponent<IProps, IState> {
             error={values.book.isErrorAuthor}
             label="Автор"
             value={values.book.author}
-            onChange={this.handleChangeInput('author')}
+            onChange={this.handleChangeBookInput('author')}
             helperText={`${values.book.author && values.book.author.length || 0}/${Book.authorMaxLength}`}
             {...commonProps}
           />
@@ -126,7 +127,7 @@ class AddBook extends PureComponent<IProps, IState> {
             error={values.book.isErrorName}
             label="Название"
             value={values.book.name}
-            onChange={this.handleChangeInput('name')}
+            onChange={this.handleChangeBookInput('name')}
             helperText={`${values.book.name && values.book.name.length || 0}/${Book.nameMaxLength}`}
             {...commonProps}
           />
@@ -137,7 +138,7 @@ class AddBook extends PureComponent<IProps, IState> {
             error={values.book.isErrorDescription}
             label="Описание"
             value={values.book.description}
-            onChange={this.handleChangeInput('description')}
+            onChange={this.handleChangeBookInput('description')}
             multiline={true}
             rowsMax="10"
             helperText={`${values.book.description && values.book.description.length || 0}/${Book.descriptionMaxLength}`}
@@ -173,7 +174,7 @@ class AddBook extends PureComponent<IProps, IState> {
         </Box>
         <Button
           className={classes.button}
-          disabled={values.book.isError}
+          disabled={values.isError}
           variant="contained"
           color="primary"
           onClick={this.handleClickAdd}
@@ -194,7 +195,15 @@ class AddBook extends PureComponent<IProps, IState> {
     this.props.redirect('/');
   }
 
-  private handleChangeInput = (name: keyof IBookState) => {
+  private handleChangeBookListInput = (name: keyof IBookListInputProps) => {
+    return (event: React.ChangeEvent<HTMLInputElement>) => {
+      const cloneBook = BookList.clone(this.state.values);
+      (cloneBook[name] as string) = event.target.value;
+      this.setState({ values: cloneBook });
+    };
+  }
+
+  private handleChangeBookInput = (name: keyof IBookInputProps) => {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
       const cloneBook = BookList.clone(this.state.values);
       (cloneBook.book[name] as string) = event.target.value;

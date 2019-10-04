@@ -1,32 +1,15 @@
-export enum BaseType {
-  Done = 'done',
-  InProcess = 'in-process',
-  Planned = 'planned',
-}
-
 export interface IBook {
    cover?: string;
    doneDate?: Date | null;
    author: string | undefined;
    description: string | undefined;
    name: string | undefined;
-   readingTarget: string;
-   type: BaseType;
    shortDescription: string;
 }
 
 export class Book implements IBook {
   get shortDescription(): string {
     return this.description.substr(0, Book.shortDescriptionLength) + '...';
-  }
-
-  get type(): BaseType {
-    return this._type;
-  }
-
-  set type(value: BaseType) {
-    this.doneDate = (value !== BaseType.Done) ? null : new Date();
-    this._type = value;
   }
 
   get author(): string {
@@ -65,24 +48,14 @@ export class Book implements IBook {
     return this._name === '';
   }
 
-  get readingTarget(): string {
-    return this._readingTarget;
-  }
-
-  set readingTarget(value: string) {
-    this._readingTarget = value.substr(0, Book.readingTargetMaxLength);
-  }
-
   get isError(): boolean {
     return this.isErrorAuthor || !this._author ||
       this.isErrorName || !this._name ||
-      this.isErrorDescription || !this._description ||
-      this.doneDate instanceof Date && isNaN(this.doneDate.getTime());
+      this.isErrorDescription || !this._description;
   }
 
   public static authorMaxLength = 100;
   public static nameMaxLength = 100;
-  public static readingTargetMaxLength = 250;
   public static descriptionMaxLength = 1000;
   public static shortDescriptionLength = 100;
 
@@ -99,11 +72,8 @@ export class Book implements IBook {
   }
 
   public cover?: string;
-  public doneDate?: Date | null;
 
   private _author: string | undefined = undefined;
   private _description: string | undefined = undefined;
   private _name: string | undefined = undefined;
-  private _readingTarget: string = '';
-  private _type: BaseType = BaseType.Planned;
 }
