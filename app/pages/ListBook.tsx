@@ -178,7 +178,7 @@ class ListBook extends PureComponent<IProps, IState> {
                 <Card>
                   <CardContent>
                     <Typography variant="h6" component="h2">{value.book.name}</Typography>
-                    <Typography color="textSecondary">{value.book.author}</Typography>
+                    <Typography color="textSecondary">{value.book.author.name}</Typography>
                     <Typography variant="body2" component="p">{value.book.shortDescription}</Typography>
                   </CardContent>
                   <CardActions>

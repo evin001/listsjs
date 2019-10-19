@@ -31,11 +31,9 @@ export class BookListProvider implements IBookListProvider {
     let collections: OrderedMap<string, IBookList> = OrderedMap();
 
     for (let i = 0; i < books.size; i++) {
-      const doc = books.docs[i];
-      const bookDoc: firebase.firestore.DocumentSnapshot = await doc.data().bookId.get();
-      if (bookDoc.exists) {
-        const bookList = docToBookList(doc.data(), bookDoc.data());
-        collections = collections.set(doc.id, bookList);
+      const bookList = await this.getBookListByDoc(books.docs[i]);
+      if (bookList) {
+        collections = collections.set(books.docs[i].id, bookList);
       }
     }
 
@@ -45,18 +43,9 @@ export class BookListProvider implements IBookListProvider {
   }
 
   public async getBookById(id: string): Promise<BookList | null> {
-    const book: firebase.firestore.DocumentSnapshot =
+    const bookListDoc: firebase.firestore.DocumentSnapshot =
       await this.store.collection(BookListProvider.collection).doc(id).get();
-    if (book.exists) {
-      const data = book.data();
-      if (data) {
-        const bookDoc: firebase.firestore.DocumentSnapshot = await data.bookId.get();
-        if (bookDoc.exists) {
-          return docToBookList(data, bookDoc.data());
-        }
-      }
-    }
-    return null;
+    return this.getBookListByDoc(bookListDoc);
   }
 
   public async addBook(bookList: BookList, id?: string): Promise<any> {
@@ -85,5 +74,14 @@ export class BookListProvider implements IBookListProvider {
         : await bookProvider.createBook(bookList.book);
       transaction.update(listBookRef, { bookId: bookRef });
     });
+  }
+
+  private async getBookListByDoc(bookListDoc: firebase.firestore.DocumentSnapshot): Promise<BookList | null> {
+    if (bookListDoc.exists) {
+      const bookDoc: firebase.firestore.DocumentSnapshot = await bookListDoc.data()!.bookId.get();
+      const authorDoc: firebase.firestore.DocumentSnapshot = await bookDoc.data()!.author.get();
+      return docToBookList(bookListDoc, bookDoc, authorDoc);
+    }
+    return null;
   }
 }

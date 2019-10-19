@@ -10,7 +10,7 @@ import TextField from '@material-ui/core/TextField';
 import { DatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import clsx from 'clsx';
 import ruLocale from 'date-fns/locale/ru';
-import { BaseListType, baseTypeList, Book, BookList } from 'lists-core/domain';
+import { Author, BaseListType, baseTypeList, Book, BookList } from 'lists-core/domain';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { bookListActions, IBookListActions, ILocationActions, locationActions } from '~/adapters';
@@ -123,11 +123,11 @@ class AddBook extends PureComponent<IProps, IState> {
         <Box>
           <TextField
             required
-            error={values.book.isErrorAuthor}
+            error={values.book.author.isError}
             label="Автор"
             value={values.book.author}
             onChange={this.handleChangeBookInput('author')}
-            helperText={`${values.book.author && values.book.author.length || 0}/${Book.authorMaxLength}`}
+            helperText={`${values.book.author && values.book.author.name.length || 0}/${Author.nameMaxLength}`}
             {...commonProps}
           />
         </Box>

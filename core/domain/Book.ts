@@ -1,27 +1,17 @@
+import { Author } from 'lists-core/domain';
+
 export interface IBook {
    cover?: string;
    doneDate?: Date | null;
-   author: string | undefined;
    description: string | undefined;
    name: string | undefined;
    shortDescription: string;
+   author: Author;
 }
 
 export class Book implements IBook {
   get shortDescription(): string {
     return this.description.substr(0, Book.shortDescriptionLength) + '...';
-  }
-
-  get author(): string {
-    return this._author || '';
-  }
-
-  set author(value: string) {
-    this._author = value.substr(0, Book.authorMaxLength);
-  }
-
-  get isErrorAuthor() {
-    return this._author === '';
   }
 
   get description(): string {
@@ -49,12 +39,11 @@ export class Book implements IBook {
   }
 
   get isError(): boolean {
-    return this.isErrorAuthor || !this._author ||
+    return this.author.isError || !this._author ||
       this.isErrorName || !this._name ||
       this.isErrorDescription || !this._description;
   }
 
-  public static authorMaxLength = 100;
   public static nameMaxLength = 100;
   public static descriptionMaxLength = 1000;
   public static shortDescriptionLength = 100;
@@ -63,8 +52,7 @@ export class Book implements IBook {
     const clone = new Book();
 
     clone.cover = book.cover;
-
-    clone._author = book._author;
+    clone.author = Author.clone(book.author);
     clone._description = book._description;
     clone._name = book._name;
 
@@ -72,6 +60,7 @@ export class Book implements IBook {
   }
 
   public cover?: string;
+  public author: Author = new Author();
 
   private _author: string | undefined = undefined;
   private _description: string | undefined = undefined;
