@@ -4,6 +4,7 @@ import { IBookListProvider } from 'lists-core/boundaries';
 import { BaseListType, BookList, IBookList } from 'lists-core/domain/BookList';
 import { AppStoreProvider } from '~/providers/AppStoreProvider';
 import { BookProvider } from './BookProvider';
+import { UserProvider } from './UserProvider';
 import { bookListToDoc, docToBookList } from './utils';
 
 export class BookListProvider implements IBookListProvider {
@@ -58,17 +59,31 @@ export class BookListProvider implements IBookListProvider {
     return null;
   }
 
-  public addBook(bookList: BookList, id?: string): Promise<any> {
+  public async addBook(bookList: BookList, id?: string): Promise<any> {
     const listCollection = this.store.collection(BookListProvider.collection);
     const bookCollection = this.store.collection(BookProvider.collection);
+    const userCollection = this.store.collection(UserProvider.collection);
 
     if (id) {
+      // Update list book by id
       const batch = this.store.batch();
       batch.update(listCollection.doc(id), bookListToDoc(bookList).bookList);
       batch.update(bookCollection.doc(bookList.bookId), bookListToDoc(bookList).book);
       return batch.commit();
     }
 
-    return undefined;
+    // Create list book
+    const listBookRef: firebase.firestore.DocumentReference = await listCollection.add({
+      ...bookListToDoc(bookList).bookList,
+      userId: userCollection.doc(bookList.userId),
+    });
+
+    return this.store.runTransaction(async (transaction) => {
+      const bookProvider = new BookProvider();
+      const bookRef: firebase.firestore.DocumentReference = bookList.bookId
+        ? await bookProvider.updateBook(bookList.book, bookList.bookId)
+        : await bookProvider.createBook(bookList.book);
+      transaction.update(listBookRef, { bookId: bookRef });
+    });
   }
 }

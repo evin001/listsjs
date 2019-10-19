@@ -30,6 +30,7 @@ interface IBookListInputProps {
 
 interface IMapStateToProps {
   bookFromList: BookList | null;
+  user: any;
 }
 
 interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookListActions, ILocationActions {
@@ -61,10 +62,19 @@ const styles = (theme: Theme) => createStyles({
 
 class AddBook extends PureComponent<IProps, IState> {
 
-  public state = {
-    values: new BookList(),
-    isUpdateFromProps: false,
-  };
+  constructor(props: IProps) {
+    super(props);
+
+    const bookList = new BookList();
+    if (props.user && !props.match.params.id) {
+      bookList.userId = props.user.id;
+    }
+
+    this.state = {
+      values: bookList,
+      isUpdateFromProps: false,
+    };
+  }
 
   public componentDidMount() {
     const { match, getBookById } = this.props;
@@ -231,6 +241,7 @@ class AddBook extends PureComponent<IProps, IState> {
 
 const mapStateToProps = (state: IStateType): IMapStateToProps => ({
   bookFromList: state.bookList.book,
+  user: state.user.userRef,
 });
 
 export default connect(mapStateToProps, {

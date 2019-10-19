@@ -34,15 +34,19 @@ export function docToBookList(
 
 export function bookListToDoc(bookList: BookList) {
   return {
-    book: {
-      author: bookList.book.author,
-      name: bookList.book.name,
-      description: bookList.book.description,
-    },
+    book: bookToDoc(bookList.book),
     bookList: {
       type: bookList.type,
       ...(bookList.readingTarget !== undefined ? { readingTarget: bookList.readingTarget } : {}),
       ...(bookList.doneDate !== undefined ? { doneDate: bookList.doneDate } : {}),
     },
+  };
+}
+
+export function bookToDoc(book: Book) {
+  return {
+    author: book.author,
+    name: book.name,
+    description: book.description,
   };
 }
