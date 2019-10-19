@@ -6,7 +6,7 @@ import { AppStoreProvider } from './AppStoreProvider';
 import { docToBook } from './utils';
 
 export class BookProvider implements IBookProvider {
-  private static collection = 'books';
+  public static collection = 'books';
 
   private static bookToDoc(book: Book) {
     return {

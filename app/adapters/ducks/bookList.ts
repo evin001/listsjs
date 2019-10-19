@@ -7,6 +7,7 @@ import { BookListProvider } from '~/providers';
 import { appName, moduleName } from '../constants';
 import { errorActions } from './error';
 import { loaderActions } from './loader';
+import { locationActions } from './location';
 import { notificationActions, NotificationType } from './notification';
 
 // Types
@@ -30,6 +31,7 @@ export interface IBookListAction {
 export interface IBookListActions {
   getBookList: typeof getBookListAction;
   getBookById: typeof getBookByIdAction;
+  addBook: typeof addBookAction;
 }
 
 // Actions
@@ -39,6 +41,8 @@ export const RESET_BOOK_LIST = `${appName}/${moduleName}/RESET_BOOK_LIST`;
 
 export const GET_BOOK_BY_ID_REQUEST = `${appName}/${moduleName}/GET_BOOK_BY_ID_REQUEST`;
 export const GET_BOOK_BY_ID_SUCCESS = `${appName}/${moduleName}/GET_BOOK_BY_ID_SUCCESS`;
+
+export const ADD_BOOK_REQUEST = `${appName}/${moduleName}/ADD_BOOK_REQUEST`;
 
 // Reducer
 export const initialBookListState: IBookListState = {
@@ -117,10 +121,17 @@ function getBookByIdSuccessAction(bookFromList: any) {
   };
 }
 
+function addBookAction(bookList: IBookList, id?: string, uri?: string) {
+  return {
+    type: ADD_BOOK_REQUEST,
+    payload: { bookList, id, uri },
+  };
+}
+
 export const bookListActions: IBookListActions = {
   getBookList: getBookListAction,
   getBookById: getBookByIdAction,
-  // addBookToList: addBookToListAction,
+  addBook: addBookAction,
 };
 
 // Sagas
@@ -171,9 +182,35 @@ function* getBookByIdSaga(action: any) {
   }
 }
 
+function* addBookSaga(action: any) {
+  const { payload } = action;
+  try {
+    yield put(loaderActions.loading());
+    const provider = new BookListProvider();
+    const interactor = new BookListInteractor(provider);
+    yield call([interactor, interactor.addBook], payload.bookList, payload.id);
+    yield put(notificationActions.showMessage(
+      payload.id ? 'Книга обновлена' : 'Книга добавлена',
+      NotificationType.Success,
+    ));
+    if (payload.uri) {
+      yield put(locationActions.redirect(payload.uri));
+    }
+  } catch (error) {
+    yield put(errorActions.handle(error));
+    yield put(notificationActions.showMessage(
+      payload.id ? 'Не удалось обновить книгу' : 'Не удалось добавить книгу',
+      NotificationType.Error,
+    ));
+  } finally {
+    yield put(loaderActions.loaded());
+  }
+}
+
 export function* bookListSaga() {
   yield all([
     takeEvery(GET_BOOK_LIST_REQUEST, getBookListSaga),
     takeEvery(GET_BOOK_BY_ID_REQUEST, getBookByIdSaga),
+    takeEvery(ADD_BOOK_REQUEST, addBookSaga),
   ]);
 }

@@ -23,9 +23,26 @@ export function docToBookList(
     list.book = docToBook(book);
     list.readingTarget = bookList.readingTarget;
     list.type = bookList.type;
+    list.bookId = bookList.bookId.id;
+    list.userId = bookList.userId.id;
     if (bookList.doneDate instanceof firebase.firestore.Timestamp) {
       list.doneDate = bookList.doneDate.toDate();
     }
   }
   return list;
+}
+
+export function bookListToDoc(bookList: BookList) {
+  return {
+    book: {
+      author: bookList.book.author,
+      name: bookList.book.name,
+      description: bookList.book.description,
+    },
+    bookList: {
+      type: bookList.type,
+      ...(bookList.readingTarget !== undefined ? { readingTarget: bookList.readingTarget } : {}),
+      ...(bookList.doneDate !== undefined ? { doneDate: bookList.doneDate } : {}),
+    },
+  };
 }

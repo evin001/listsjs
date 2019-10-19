@@ -3,7 +3,8 @@ import { OrderedMap } from 'immutable';
 import { IBookListProvider } from 'lists-core/boundaries';
 import { BaseListType, BookList, IBookList } from 'lists-core/domain/BookList';
 import { AppStoreProvider } from '~/providers/AppStoreProvider';
-import { docToBookList } from './utils';
+import { BookProvider } from './BookProvider';
+import { bookListToDoc, docToBookList } from './utils';
 
 export class BookListProvider implements IBookListProvider {
 
@@ -55,5 +56,19 @@ export class BookListProvider implements IBookListProvider {
       }
     }
     return null;
+  }
+
+  public addBook(bookList: BookList, id?: string): Promise<any> {
+    const listCollection = this.store.collection(BookListProvider.collection);
+    const bookCollection = this.store.collection(BookProvider.collection);
+
+    if (id) {
+      const batch = this.store.batch();
+      batch.update(listCollection.doc(id), bookListToDoc(bookList).bookList);
+      batch.update(bookCollection.doc(bookList.bookId), bookListToDoc(bookList).book);
+      return batch.commit();
+    }
+
+    return undefined;
   }
 }

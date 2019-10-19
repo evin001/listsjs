@@ -22,6 +22,8 @@ export interface IBookList {
   doneDate?: Date | null;
   readingTarget: string;
   type: BaseListType;
+  bookId?: string;
+  userId?: string;
 }
 
 export class BookList implements IBookList {
@@ -56,10 +58,14 @@ export class BookList implements IBookList {
     clone.type = bookList.type;
     clone.doneDate = bookList.doneDate;
     clone.readingTarget = bookList.readingTarget;
+    clone.bookId = bookList.bookId;
+    clone.userId = bookList.userId;
 
     return clone;
   }
 
+  public bookId?: string;
+  public userId?: string;
   public book: Book = new Book();
   public doneDate?: Date | null;
 

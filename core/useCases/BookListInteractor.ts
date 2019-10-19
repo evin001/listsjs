@@ -1,5 +1,5 @@
 import { IBookListProvider } from 'lists-core/boundaries';
-import { BaseListType } from 'lists-core/domain';
+import { BaseListType, BookList } from 'lists-core/domain';
 
 export class BookListInteractor implements IBookListProvider {
   constructor(private provider: IBookListProvider) {}
@@ -10,5 +10,9 @@ export class BookListInteractor implements IBookListProvider {
 
   public getBookById(id: string): Promise<any> {
     return this.provider.getBookById(id);
+  }
+
+  public addBook(bookList: BookList, id: string) {
+    return this.provider.addBook(bookList, id);
   }
 }
