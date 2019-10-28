@@ -50,6 +50,7 @@ export function docToBookList(
 
 export function bookListToDoc(bookList: BookList) {
   return {
+    author: authorToDoc(bookList.book.author),
     book: bookToDoc(bookList.book),
     bookList: {
       type: bookList.type,
@@ -61,8 +62,13 @@ export function bookListToDoc(bookList: BookList) {
 
 export function bookToDoc(book: Book) {
   return {
-    author: book.author,
     name: book.name,
     description: book.description,
+  };
+}
+
+export function authorToDoc(author: Author) {
+  return {
+    name: author.name,
   };
 }

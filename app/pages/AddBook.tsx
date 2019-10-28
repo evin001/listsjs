@@ -125,7 +125,7 @@ class AddBook extends PureComponent<IProps, IState> {
             required
             error={values.book.author.isError}
             label="Автор"
-            value={values.book.author}
+            value={values.book.author.name}
             onChange={this.handleChangeBookInput('author')}
             helperText={`${values.book.author && values.book.author.name.length || 0}/${Author.nameMaxLength}`}
             {...commonProps}
@@ -216,7 +216,11 @@ class AddBook extends PureComponent<IProps, IState> {
   private handleChangeBookInput = (name: keyof IBookInputProps) => {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
       const cloneBook = BookList.clone(this.state.values);
-      (cloneBook.book[name] as string) = event.target.value;
+      if (name !== 'author') {
+        (cloneBook.book[name] as string) = event.target.value;
+      } else {
+        (cloneBook.book.author.name as string) = event.target.value;
+      }
       this.setState({ values: cloneBook });
     };
   }

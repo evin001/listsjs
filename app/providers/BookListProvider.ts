@@ -3,6 +3,7 @@ import { OrderedMap } from 'immutable';
 import { IBookListProvider } from 'lists-core/boundaries';
 import { BaseListType, BookList, IBookList } from 'lists-core/domain/BookList';
 import { AppStoreProvider } from '~/providers/AppStoreProvider';
+import { AuthorProvider } from './AuthorProvider';
 import { BookProvider } from './BookProvider';
 import { UserProvider } from './UserProvider';
 import { bookListToDoc, docToBookList } from './utils';
@@ -52,12 +53,15 @@ export class BookListProvider implements IBookListProvider {
     const listCollection = this.store.collection(BookListProvider.collection);
     const bookCollection = this.store.collection(BookProvider.collection);
     const userCollection = this.store.collection(UserProvider.collection);
+    const authorCollection = this.store.collection(AuthorProvider.collection);
 
     if (id) {
       // Update list book by id
+      const bookListDoc = bookListToDoc(bookList);
       const batch = this.store.batch();
-      batch.update(listCollection.doc(id), bookListToDoc(bookList).bookList);
-      batch.update(bookCollection.doc(bookList.bookId), bookListToDoc(bookList).book);
+      batch.update(listCollection.doc(id), bookListDoc.bookList);
+      batch.update(bookCollection.doc(bookList.bookId), bookListDoc.book);
+      batch.update(authorCollection.doc(bookList.book.author.id), bookListDoc.author);
       return batch.commit();
     }
 

@@ -20,6 +20,7 @@ export class Author implements IAuthor {
 
   public static clone(author: Author): Author {
     const clone = new Author();
+    clone.id = author.id;
     clone.name = author.name;
     return clone;
   }

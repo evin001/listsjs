@@ -39,7 +39,7 @@ export class Book implements IBook {
   }
 
   get isError(): boolean {
-    return this.author.isError || !this._author ||
+    return this.author.isError ||
       this.isErrorName || !this._name ||
       this.isErrorDescription || !this._description;
   }
