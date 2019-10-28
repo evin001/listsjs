@@ -77,6 +77,11 @@ export class BookListProvider implements IBookListProvider {
         ? await bookProvider.updateBook(bookList.book, bookList.bookId)
         : await bookProvider.createBook(bookList.book);
       transaction.update(listBookRef, { bookId: bookRef });
+
+      const authorProvider = new AuthorProvider();
+      const authorRef: firebase.firestore.DocumentReference =
+        await authorProvider.setAuthor(bookList.book.author);
+      transaction.update(bookRef, { author: authorRef });
     });
   }
 

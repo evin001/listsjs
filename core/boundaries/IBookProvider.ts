@@ -1,4 +1,3 @@
-import { BaseListType } from 'lists-core/domain';
 import { Book } from '../domain';
 
 export interface IBookProvider {
