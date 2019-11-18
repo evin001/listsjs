@@ -22,7 +22,9 @@
       "check-format",
       "allow-leading-underscore",
       "allow-pascal-case"
-    ]
+    ],
+    "member-access": [true, "no-public"],
+    "interface-over-type-literal": false
   },
   "rulesDirectory": [
     "node_modules/tslint-eslint-rules/dist/rules"

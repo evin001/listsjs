@@ -21,11 +21,11 @@ import {
   ILocationActions, locationActions, UserRefType,
 } from '~/adapters';
 import BookFilters from '~/components/BookFilters';
-import { IStateType } from '~/frameworks';
+import { GlobalState } from '~/frameworks';
 
 interface IMapStateToProps {
   done: boolean;
-  isLoading: boolean;
+  loading: boolean;
   bookList: BookListType;
   filterType?: BookListFilterType;
   userRef: UserRefType;
@@ -117,22 +117,27 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
+const handleClickAddBook = Symbol();
+const handleChangeType = Symbol();
+const handleClickBeforePage = Symbol();
+const handleClickNextPage = Symbol();
+
 class ListBook extends PureComponent<IProps, IState> {
 
-  public state = {
+  readonly state = {
     current: pageMachine.initialState,
   };
 
-  public service = interpret(pageMachine).onTransition((current) => {
+  service = interpret(pageMachine).onTransition((current) => {
     this.setState({ current });
   });
 
-  public componentDidMount() {
+  componentDidMount() {
     this.service.start();
-    this.handleChangeType(this.props.filterType, true);
+    this[handleChangeType](this.props.filterType, true);
   }
 
-  public componentDidUpdate() {
+  componentDidUpdate() {
     const { done, bookList } = this.props;
     const { current } = this.state;
     if (done && bookList.size === current.context.page) {
@@ -140,12 +145,12 @@ class ListBook extends PureComponent<IProps, IState> {
     }
   }
 
-  public componentWillUnmount() {
+  componentWillUnmount() {
     this.service.stop();
   }
 
-  public render() {
-    const { bookList, done, isLoading, classes } = this.props;
+  render() {
+    const { bookList, done, loading, classes } = this.props;
     const { current } = this.state;
     const { page, type } = current.context;
     const listBooks = bookList.get(page);
@@ -153,17 +158,17 @@ class ListBook extends PureComponent<IProps, IState> {
     return (
       <Box my={1}>
         <div className={classes.control}>
-          <BookFilters type={type} onChangeType={this.handleChangeType} />
+          <BookFilters type={type} onChangeType={this[handleChangeType]} />
           <Box className={classes.pagination}>
             <IconButton
               className={classes.button}
-              onClick={this.handleClickBeforePage}
+              onClick={this[handleClickBeforePage]}
               disabled={page === 0}
             >
               <NavigateBefore />
             </IconButton>
             <IconButton
-              onClick={this.handleClickNextPage}
+              onClick={this[handleClickNextPage]}
               disabled={done && page + 1 === bookList.size}
             >
               <NavigateNext />
@@ -171,7 +176,7 @@ class ListBook extends PureComponent<IProps, IState> {
           </Box>
         </div>
 
-        {!isLoading && (
+        {!loading && (
           <Grid container spacing={2}>
             {listBooks && listBooks.map(((value, key) => (
               <Grid item xs={6} key={key}>
@@ -194,7 +199,7 @@ class ListBook extends PureComponent<IProps, IState> {
           className={classes.addBook}
           variant="contained"
           color="primary"
-          onClick={this.handleClickAddBook}
+          onClick={this[handleClickAddBook]}
         >
           Добавить книгу
         </Button>
@@ -202,13 +207,13 @@ class ListBook extends PureComponent<IProps, IState> {
     );
   }
 
-  private handleClickAddBook = () => {
+  [handleClickAddBook] = () => {
     const { current: { context: { type } } } = this.state;
     const uri = type ? `/add-book/type/${type}` : '/add-book';
     this.props.redirect(uri);
   }
 
-  private handleChangeType = (value?: BaseListType | null, reset?: boolean) => {
+  [handleChangeType] = (value?: BaseListType | null, reset?: boolean) => {
     this.service.send([
       'RESET',
       { type: 'FILTER', value: value || null, callback: (type: BookListFilterType) => {
@@ -217,11 +222,11 @@ class ListBook extends PureComponent<IProps, IState> {
     ]);
   }
 
-  private handleClickBeforePage = () => {
+  [handleClickBeforePage] = () => {
     this.service.send('DEC');
   }
 
-  private handleClickNextPage = () => {
+  [handleClickNextPage] = () => {
     const { bookList, done, userRef } = this.props;
     const { current } = this.state;
     if (!(done || bookList.get(current.context.page + 1))) {
@@ -231,11 +236,11 @@ class ListBook extends PureComponent<IProps, IState> {
   }
 }
 
-const mapStateToProps = (state: IStateType): IMapStateToProps => ({
+const mapStateToProps = (state: GlobalState): IMapStateToProps => ({
   bookList: state.bookList.bookList,
   done: state.bookList.done,
   filterType: state.bookList.filterType,
-  isLoading: state.loader.isLoading,
+  loading: state.loader.loading,
   userRef: state.user.userRef,
 });
 

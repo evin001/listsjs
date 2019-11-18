@@ -2,22 +2,24 @@ import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { createLogger } from 'redux-logger';
 import createSagaMiddleware from 'redux-saga';
 import {
-  bookListReducer, bookReducer,
-  IBookListState, IBookState,
-  ILoaderState,
-  INotificationState,
-  IUserState, loaderReducer,
+  authorReducer, bookListReducer,
+  bookReducer, IAuthorState,
+  IBookListState,
+  IBookState,
+  INotificationState, IUserState,
+  loaderReducer, LoaderState,
   notificationReducer, rootSaga,
   routerReducer, userReducer,
 } from '~/adapters';
 
-export interface IStateType {
+export type GlobalState = {
   book: IBookState;
   bookList: IBookListState;
   notification: INotificationState;
-  loader: ILoaderState;
+  loader: LoaderState;
   user: IUserState;
-}
+  author: IAuthorState;
+};
 
 const rootReducer = {
   book: bookReducer,
@@ -26,6 +28,7 @@ const rootReducer = {
   router: routerReducer,
   loader: loaderReducer,
   user: userReducer,
+  author: authorReducer,
 };
 
 export const configureStore = () => {

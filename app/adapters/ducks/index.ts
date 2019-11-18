@@ -5,3 +5,4 @@ export * from './loader';
 export * from './error';
 export * from './user';
 export * from './bookList';
+export * from './author';

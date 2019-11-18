@@ -13,12 +13,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface IProps {
+type Props = {
   type: BaseListType | null;
   onChangeType: (type: BaseListType) => void;
-}
+};
 
-const BookFilters = ({ type, onChangeType }: IProps) => {
+const BookFilters = ({ type, onChangeType }: Props) => {
   const classes = useStyles();
 
   function handleClick(value: BaseListType) {

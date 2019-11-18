@@ -17,6 +17,10 @@ export interface ILocationActions {
   redirect: typeof redirectAction;
 }
 
+export type LocationActions = {
+  redirect: typeof redirectAction;
+};
+
 export const locationActions: ILocationActions = {
   redirect: redirectAction,
 };

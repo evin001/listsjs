@@ -13,39 +13,49 @@ import ruLocale from 'date-fns/locale/ru';
 import { Author, BaseListType, baseTypeList, Book, BookList } from 'lists-core/domain';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { bookListActions, IBookListActions, ILocationActions, locationActions } from '~/adapters';
-import { IStateType } from '~/frameworks';
+import { authorActions, AuthorActions, bookListActions, BookListActions, LocationActions, locationActions } from '~/adapters';
+import AsyncAutocomplete from '~/components/AsyncAutocomplete';
+import { GlobalState } from '~/frameworks';
 
-interface ICommonProps {}
+type MapStateToProps = {
+  bookFromList: BookList | null;
+  user: any;
+  loading: boolean;
+};
 
-interface IBookInputProps {
+type Props = {
+  match: {
+    params: {
+      id?: string;
+      type?: BaseListType;
+    },
+  },
+  children?: never;
+} & WithStyles<typeof styles> & MapStateToProps & BookListActions & LocationActions & AuthorActions;
+
+type State = ReturnType<typeof getInitialState>;
+
+type BookInputProps = {
   author: string;
   name: string;
   description: string;
-}
+};
 
-interface IBookListInputProps {
+type BookListInputProps = {
   readingTarget: string;
-}
+};
 
-interface IMapStateToProps {
-  bookFromList: BookList | null;
-  user: any;
-}
+const getInitialState = (props: Props) => {
+  const bookList = new BookList();
+  if (props.user && !props.match.params.id) {
+    bookList.userId = props.user.id;
+  }
 
-interface IProps extends WithStyles<typeof styles>, IMapStateToProps, IBookListActions, ILocationActions {
-  match: {
-    params: {
-      id?: string,
-      type?: BaseListType,
-    },
+  return {
+    values: bookList,
+    isUpdateFromProps: false,
   };
-}
-
-interface IState {
-  values: BookList;
-  isUpdateFromProps: boolean;
-}
+};
 
 const styles = (theme: Theme) => createStyles({
   formControl: {
@@ -60,23 +70,17 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
-class AddBook extends PureComponent<IProps, IState> {
+const handleCancel = Symbol();
+const handleChangeBookListInput = Symbol();
+const handleChangeBookInput = Symbol();
+const handleChangeSelect = Symbol();
+const handleChangeDate = Symbol();
+const handleClickAdd = Symbol();
 
-  constructor(props: IProps) {
-    super(props);
+class AddBook extends PureComponent<Props, State> {
+  readonly state = getInitialState(this.props);
 
-    const bookList = new BookList();
-    if (props.user && !props.match.params.id) {
-      bookList.userId = props.user.id;
-    }
-
-    this.state = {
-      values: bookList,
-      isUpdateFromProps: false,
-    };
-  }
-
-  public componentDidMount() {
+  componentDidMount() {
     const { match, getBookById } = this.props;
 
     if (match.params.id) {
@@ -90,7 +94,7 @@ class AddBook extends PureComponent<IProps, IState> {
     }
   }
 
-  public componentDidUpdate() {
+  componentDidUpdate() {
     const { bookFromList, match } = this.props;
     const { isUpdateFromProps } = this.state;
     if (match.params.id && bookFromList && !isUpdateFromProps) {
@@ -101,10 +105,10 @@ class AddBook extends PureComponent<IProps, IState> {
     }
   }
 
-  public render() {
-    const { classes, match } = this.props;
+  render() {
+    const { classes, match, loading } = this.props;
     const { values } = this.state;
-    const commonProps: ICommonProps = {
+    const commonProps: object = {
       fullWidth: true,
       margin: 'normal',
     };
@@ -115,19 +119,21 @@ class AddBook extends PureComponent<IProps, IState> {
           <TextField
             label="Цель прочтения"
             value={values.readingTarget}
-            onChange={this.handleChangeBookListInput('readingTarget')}
+            onChange={this[handleChangeBookListInput]('readingTarget')}
             helperText={`${values.readingTarget && values.readingTarget.length || 0}/${BookList.readingTargetMaxLength}`}
             {...commonProps}
           />
         </Box>
         <Box>
-          <TextField
+          <AsyncAutocomplete
             required
             error={values.book.author.isError}
             label="Автор"
+            options={[]}
             value={values.book.author.name}
-            onChange={this.handleChangeBookInput('author')}
+            onChange={this[handleChangeBookInput]('author')}
             helperText={`${values.book.author && values.book.author.name.length || 0}/${Author.nameMaxLength}`}
+            loading={loading}
             {...commonProps}
           />
         </Box>
@@ -136,8 +142,7 @@ class AddBook extends PureComponent<IProps, IState> {
             required
             error={values.book.isErrorName}
             label="Название"
-            value={values.book.name}
-            onChange={this.handleChangeBookInput('name')}
+            onChange={this[handleChangeBookInput]('name')}
             helperText={`${values.book.name && values.book.name.length || 0}/${Book.nameMaxLength}`}
             {...commonProps}
           />
@@ -148,7 +153,7 @@ class AddBook extends PureComponent<IProps, IState> {
             error={values.book.isErrorDescription}
             label="Описание"
             value={values.book.description}
-            onChange={this.handleChangeBookInput('description')}
+            onChange={this[handleChangeBookInput]('description')}
             multiline={true}
             rowsMax="10"
             helperText={`${values.book.description && values.book.description.length || 0}/${Book.descriptionMaxLength}`}
@@ -163,7 +168,7 @@ class AddBook extends PureComponent<IProps, IState> {
                 label="Дата прочтения"
                 format="dd.MM.yyyy"
                 value={values.doneDate}
-                onChange={this.handleChangeDate}
+                onChange={this[handleChangeDate]}
               />
             </MuiPickersUtilsProvider>
           </Box>
@@ -174,7 +179,7 @@ class AddBook extends PureComponent<IProps, IState> {
             <Select
               value={values.type}
               inputProps={{ id: 'list-type', name: 'type' }}
-              onChange={this.handleChangeSelect}
+              onChange={this[handleChangeSelect]}
             >
               {baseTypeList.map((data) => (
                 <MenuItem key={data.key} value={data.key}>{data.label}</MenuItem>
@@ -187,13 +192,13 @@ class AddBook extends PureComponent<IProps, IState> {
           disabled={values.isError}
           variant="contained"
           color="primary"
-          onClick={this.handleClickAdd}
+          onClick={this[handleClickAdd]}
         >
           {match.params.id ? 'Обновить' : 'Добавить'}
         </Button>
         <Button
           className={clsx(classes.button, classes.cancel)}
-          onClick={this.handleCancel}
+          onClick={this[handleCancel]}
         >
           Отменить
         </Button>
@@ -201,11 +206,11 @@ class AddBook extends PureComponent<IProps, IState> {
     );
   }
 
-  private handleCancel = () => {
+  [handleCancel] = () => {
     this.props.redirect('/');
   }
 
-  private handleChangeBookListInput = (name: keyof IBookListInputProps) => {
+  [handleChangeBookListInput] = (name: keyof BookListInputProps) => {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
       const cloneBook = BookList.clone(this.state.values);
       (cloneBook[name] as string) = event.target.value;
@@ -213,42 +218,45 @@ class AddBook extends PureComponent<IProps, IState> {
     };
   }
 
-  private handleChangeBookInput = (name: keyof IBookInputProps) => {
+  [handleChangeBookInput] = (name: keyof BookInputProps) => {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
       const cloneBook = BookList.clone(this.state.values);
       if (name !== 'author') {
         (cloneBook.book[name] as string) = event.target.value;
-      } else {
+      } else if (name === 'author') {
         (cloneBook.book.author.name as string) = event.target.value;
+        this.props.searchAuthors(event.target.value);
       }
       this.setState({ values: cloneBook });
     };
   }
 
-  private handleChangeSelect = (event: React.ChangeEvent<{ name?: string, value: unknown }>) => {
+  [handleChangeSelect] = (event: React.ChangeEvent<{ name?: string, value: unknown }>) => {
     const cloneBook = BookList.clone(this.state.values);
     cloneBook.type = event.target.value as BaseListType;
     this.setState({ values: cloneBook });
   }
 
-  private handleChangeDate = (date: Date | null) => {
+  [handleChangeDate] = (date: Date | null) => {
     const cloneBook = BookList.clone(this.state.values);
     cloneBook.doneDate = date;
     this.setState({ values: cloneBook });
   }
 
-  private handleClickAdd = () => {
+  [handleClickAdd] = () => {
     const { addBook, match } = this.props;
     addBook(this.state.values, match.params.id, '/');
   }
 }
 
-const mapStateToProps = (state: IStateType): IMapStateToProps => ({
+const mapStateToProps = (state: GlobalState): MapStateToProps => ({
   bookFromList: state.bookList.book,
   user: state.user.userRef,
+  loading: state.loader.loading,
 });
 
 export default connect(mapStateToProps, {
+  ...authorActions,
   ...bookListActions,
   ...locationActions,
 })(withStyles(styles)(AddBook));

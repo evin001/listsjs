@@ -72,3 +72,9 @@ export function authorToDoc(author: Author) {
     name: author.name,
   };
 }
+
+export function getSearchEndCode(value: string): string {
+  const startCode = value.slice(0, value.length - 1);
+  const lastChar = value.slice(value.length - 1, value.length);
+  return `${startCode}${String.fromCharCode(lastChar.charCodeAt(0) + 1)}`;
+}

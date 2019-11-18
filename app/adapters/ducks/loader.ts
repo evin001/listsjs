@@ -1,35 +1,31 @@
 import { Reducer } from 'redux';
 import { appName, moduleName } from '../constants';
 
-// Actions
-const LOADER_LOADING = `${appName}/${moduleName}/LOADER_LOADING`;
-const LOADER_LOADED = `${appName}/${moduleName}/LOADER_LOADED`;
-
-export interface ILoaderState {
-  isLoading: boolean;
-}
+export type LoaderState = typeof initialState;
 
 export interface ILoaderAction {
   type: string;
   payload: boolean;
 }
 
-const initialState = {
-  isLoading: false,
-};
+const initialState = Object.freeze({ loading: false });
+
+// Actions
+const LOADER_LOADING = `${appName}/${moduleName}/LOADER_LOADING`;
+const LOADER_LOADED = `${appName}/${moduleName}/LOADER_LOADED`;
 
 // Reducer
-export const loaderReducer: Reducer<ILoaderState, ILoaderAction> = (state = initialState, action) => {
+export const loaderReducer: Reducer<LoaderState, ILoaderAction> = (state = initialState, action) => {
   switch (action.type) {
     case LOADER_LOADING:
       return {
       ...state,
-      isLoading: true,
+      loading: true,
     };
     case LOADER_LOADED:
       return {
         ...state,
-        isLoading: false,
+        loading: false,
       };
     default:
       return state;

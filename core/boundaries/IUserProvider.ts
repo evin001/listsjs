@@ -1,3 +1,3 @@
 export interface IUserProvider {
-  signInByEmail(email: string, password: string): Promise<any>;
+  signInByEmail: (email: string, password: string) => Promise<any>;
 }

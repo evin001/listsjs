@@ -44,11 +44,11 @@ export class Book implements IBook {
       this.isErrorDescription || !this._description;
   }
 
-  public static nameMaxLength = 100;
-  public static descriptionMaxLength = 1000;
-  public static shortDescriptionLength = 100;
+  static nameMaxLength = 100;
+  static descriptionMaxLength = 1000;
+  static shortDescriptionLength = 100;
 
-  public static clone(book: Book): Book {
+  static clone(book: Book): Book {
     const clone = new Book();
 
     clone.cover = book.cover;
@@ -59,8 +59,8 @@ export class Book implements IBook {
     return clone;
   }
 
-  public cover?: string;
-  public author: Author = new Author();
+  cover?: string;
+  author: Author = new Author();
 
   private _author: string | undefined = undefined;
   private _description: string | undefined = undefined;

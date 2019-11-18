@@ -6,8 +6,8 @@ import Typography from '@material-ui/core/Typography';
 import { User } from 'lists-core/domain/User';
 import React, { Fragment, PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { IUserActions, userActions, UserRefType } from '~/adapters';
-import { IStateType } from '~/frameworks';
+import { UserActions, userActions, UserRefType } from '~/adapters';
+import { GlobalState } from '~/frameworks';
 import BaseRouter from './BaseRouter';
 import Header from './Header';
 import Loader from './Loader';
@@ -19,21 +19,21 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
-interface IMapStateToProps {
+type MapStateToProps = {
   userRef: UserRefType;
-}
+};
 
-interface IProps extends WithStyles<typeof styles>, IUserActions, IMapStateToProps {}
+type Props = WithStyles<typeof styles> & UserActions & MapStateToProps;
 
-class AppWrapper extends PureComponent<IProps> {
-  public componentDidMount() {
+class AppWrapper extends PureComponent<Props> {
+  componentDidMount() {
     const user = new User();
     user.email = 'e19a@yandex.ru';
     user.password = '123456';
     this.props.signIn(user);
   }
 
-  public render() {
+  render() {
     const { classes, userRef } = this.props;
     return (
       <Fragment>
@@ -53,7 +53,7 @@ class AppWrapper extends PureComponent<IProps> {
   }
 }
 
-const mapStateToProps = (state: IStateType): IMapStateToProps => ({
+const mapStateToProps = (state: GlobalState): MapStateToProps => ({
   userRef: state.user.userRef,
 });
 

@@ -2,9 +2,9 @@ import { Map, OrderedMap } from 'immutable';
 import { BaseListType, BookList, IBookList } from 'lists-core/domain';
 import { BookListInteractor } from 'lists-core/useCases';
 import { Reducer } from 'redux';
-import { all, call, put, select, takeEvery } from 'redux-saga/effects';
+import { all, call, put, select, takeEvery, takeLatest } from 'redux-saga/effects';
 import { BookListProvider } from '~/providers';
-import { appName, moduleName } from '../constants';
+import { appName } from '../constants';
 import { errorActions } from './error';
 import { loaderActions } from './loader';
 import { locationActions } from './location';
@@ -34,7 +34,15 @@ export interface IBookListActions {
   addBook: typeof addBookAction;
 }
 
+export type BookListActions = {
+  getBookList: typeof getBookListAction;
+  getBookById: typeof getBookByIdAction;
+  addBook: typeof addBookAction;
+};
+
 // Actions
+const moduleName = 'bookList';
+
 export const GET_BOOK_LIST_REQUEST = `${appName}/${moduleName}/GET_BOOK_LIST_REQUEST`;
 export const GET_BOOK_LIST_SUCCESS = `${appName}/${moduleName}/GET_BOOK_LIST_SUCCESS`;
 export const RESET_BOOK_LIST = `${appName}/${moduleName}/RESET_BOOK_LIST`;
@@ -53,8 +61,8 @@ export const initialBookListState: IBookListState = {
 };
 
 export const bookListReducer: Reducer<IBookListState, IBookListAction> = (state = initialBookListState, action) => {
-  if (action.type === GET_BOOK_LIST_SUCCESS) {
-    {
+  switch (action.type) {
+    case GET_BOOK_LIST_SUCCESS:
       return {
         ...state,
         done: action.payload.lastDoc === null,
@@ -63,22 +71,21 @@ export const bookListReducer: Reducer<IBookListState, IBookListAction> = (state 
           bookList: state.bookList.setIn([state.bookList.size], action.payload.bookList),
         } : {}),
       };
-    }
-  } else if (action.type === RESET_BOOK_LIST) {
-    return {
-      ...state,
-      lastDoc: null,
-      bookList: Map(),
-      done: false,
-      filterType: action.payload,
-    };
-  } else if (action.type === GET_BOOK_BY_ID_SUCCESS) {
-    return {
-      ...state,
-      book: action.payload,
-    };
-  } else {
-    return state;
+    case RESET_BOOK_LIST:
+      return {
+        ...state,
+        lastDoc: null,
+        bookList: Map(),
+        done: false,
+        filterType: action.payload,
+      };
+    case GET_BOOK_BY_ID_SUCCESS:
+      return {
+        ...state,
+        book: action.payload,
+      };
+    default:
+      return state;
   }
 };
 
@@ -211,6 +218,6 @@ export function* bookListSaga() {
   yield all([
     takeEvery(GET_BOOK_LIST_REQUEST, getBookListSaga),
     takeEvery(GET_BOOK_BY_ID_REQUEST, getBookByIdSaga),
-    takeEvery(ADD_BOOK_REQUEST, addBookSaga),
+    takeLatest(ADD_BOOK_REQUEST, addBookSaga),
   ]);
 }

@@ -1,4 +1,3 @@
-import firebase from 'firebase/app';
 import { OrderedMap } from 'immutable';
 import { IBookListProvider } from 'lists-core/boundaries';
 import { BaseListType, BookList, IBookList } from 'lists-core/domain/BookList';
@@ -12,10 +11,10 @@ export class BookListProvider implements IBookListProvider {
 
   private static collection = 'lists';
 
-  private store: firebase.firestore.Firestore =
-    (AppStoreProvider.getInstance().getStore() as firebase.firestore.Firestore);
+  private store: import('firebase').firestore.Firestore =
+    (AppStoreProvider.getInstance().getStore() as import('firebase').firestore.Firestore);
 
-  public async listBook(
+  async listBook(
     userRef: any,
     cursor: any,
     type?: BaseListType,
@@ -27,7 +26,7 @@ export class BookListProvider implements IBookListProvider {
       .limit(limit);
     if (type) { request = request.where('type', '==', type); }
     if (cursor) { request = request.startAfter(cursor); }
-    const books: firebase.firestore.QuerySnapshot = await request.get();
+    const books: import('firebase').firestore.QuerySnapshot = await request.get();
 
     let collections: OrderedMap<string, IBookList> = OrderedMap();
 
@@ -43,13 +42,13 @@ export class BookListProvider implements IBookListProvider {
     return [collections, last];
   }
 
-  public async getBookById(id: string): Promise<BookList | null> {
-    const bookListDoc: firebase.firestore.DocumentSnapshot =
+  async getBookById(id: string): Promise<BookList | null> {
+    const bookListDoc: import('firebase').firestore.DocumentSnapshot =
       await this.store.collection(BookListProvider.collection).doc(id).get();
     return this.getBookListByDoc(bookListDoc);
   }
 
-  public async addBook(bookList: BookList, id?: string): Promise<any> {
+  async addBook(bookList: BookList, id?: string): Promise<any> {
     const listCollection = this.store.collection(BookListProvider.collection);
     const bookCollection = this.store.collection(BookProvider.collection);
     const userCollection = this.store.collection(UserProvider.collection);
@@ -66,29 +65,29 @@ export class BookListProvider implements IBookListProvider {
     }
 
     // Create list book
-    const listBookRef: firebase.firestore.DocumentReference = await listCollection.add({
+    const listBookRef: import('firebase').firestore.DocumentReference = await listCollection.add({
       ...bookListToDoc(bookList).bookList,
       userId: userCollection.doc(bookList.userId),
     });
 
     return this.store.runTransaction(async (transaction) => {
       const bookProvider = new BookProvider();
-      const bookRef: firebase.firestore.DocumentReference = bookList.bookId
+      const bookRef: import('firebase').firestore.DocumentReference = bookList.bookId
         ? await bookProvider.updateBook(bookList.book, bookList.bookId)
         : await bookProvider.createBook(bookList.book);
       transaction.update(listBookRef, { bookId: bookRef });
 
       const authorProvider = new AuthorProvider();
-      const authorRef: firebase.firestore.DocumentReference =
+      const authorRef: import('firebase').firestore.DocumentReference =
         await authorProvider.setAuthor(bookList.book.author);
       transaction.update(bookRef, { author: authorRef });
     });
   }
 
-  private async getBookListByDoc(bookListDoc: firebase.firestore.DocumentSnapshot): Promise<BookList | null> {
+  private async getBookListByDoc(bookListDoc: import('firebase').firestore.DocumentSnapshot): Promise<BookList | null> {
     if (bookListDoc.exists) {
-      const bookDoc: firebase.firestore.DocumentSnapshot = await bookListDoc.data()!.bookId.get();
-      const authorDoc: firebase.firestore.DocumentSnapshot = await bookDoc.data()!.author.get();
+      const bookDoc: import('firebase').firestore.DocumentSnapshot = await bookListDoc.data()!.bookId.get();
+      const authorDoc: import('firebase').firestore.DocumentSnapshot = await bookDoc.data()!.author.get();
       return docToBookList(bookListDoc, bookDoc, authorDoc);
     }
     return null;

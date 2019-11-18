@@ -1,3 +1,3 @@
 export class UserProvider {
-  public static collection = 'users';
+  static collection = 'users';
 }

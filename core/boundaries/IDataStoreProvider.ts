@@ -1,3 +1,3 @@
 export interface IDataStoreProvider {
-  getStore(): any;
+  getStore: () => any;
 }

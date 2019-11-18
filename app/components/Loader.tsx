@@ -3,7 +3,7 @@ import Box from '@material-ui/core/Box';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import React from 'react';
 import { connect } from 'react-redux';
-import { IStateType } from '~/frameworks';
+import { GlobalState } from '~/frameworks';
 
 const useStyles = makeStyles(() => createStyles({
   progress: {
@@ -12,12 +12,10 @@ const useStyles = makeStyles(() => createStyles({
   },
 }));
 
-interface IProps {
-  isLoading: boolean;
-}
+type Props = { loading: boolean };
 
-const Loader = ({ isLoading }: IProps) => {
-  if (!isLoading) {
+const Loader = ({ loading }: Props) => {
+  if (!loading) {
     return null;
   }
 
@@ -30,8 +28,8 @@ const Loader = ({ isLoading }: IProps) => {
   );
 };
 
-const mapStateToProps = (state: IStateType) => ({
-  isLoading: state.loader.isLoading,
+const mapStateToProps = (state: GlobalState) => ({
+  loading: state.loader.loading,
 });
 
 export default connect(mapStateToProps)(Loader);

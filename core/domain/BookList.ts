@@ -6,6 +6,8 @@ export enum BaseListType {
   Planned = 'planned',
 }
 
+export type BookListType = 'done' | 'in-process' | 'planned';
+
 export interface IBaseTypeList {
   key: BaseListType;
   label: string;
@@ -49,9 +51,9 @@ export class BookList implements IBookList {
       this.doneDate instanceof Date && isNaN(this.doneDate.getTime());
   }
 
-  public static readingTargetMaxLength = 250;
+  static readingTargetMaxLength = 250;
 
-  public static clone(bookList: BookList): BookList {
+  static clone(bookList: BookList): BookList {
     const clone = new BookList();
 
     clone.book = Book.clone(bookList.book);
@@ -64,10 +66,10 @@ export class BookList implements IBookList {
     return clone;
   }
 
-  public bookId?: string;
-  public userId?: string;
-  public book: Book = new Book();
-  public doneDate?: Date | null;
+  bookId?: string;
+  userId?: string;
+  book: Book = new Book();
+  doneDate?: Date | null;
 
   private _readingTarget: string = '';
   private _type: BaseListType = BaseListType.Planned;

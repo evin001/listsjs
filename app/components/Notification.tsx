@@ -11,8 +11,8 @@ import WarningIcon from '@material-ui/icons/Warning';
 import clsx from 'clsx';
 import React from 'react';
 import { connect } from 'react-redux';
-import { INotificationActions, notificationActions, NotificationType } from '~/adapters';
-import { IStateType } from '~/frameworks';
+import { NotificationActions, notificationActions, NotificationType } from '~/adapters';
+import { GlobalState } from '~/frameworks';
 
 const variantIcon = {
   success: CheckCircleIcon,
@@ -47,12 +47,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface IProps extends INotificationActions {
+type Props = {
   message?: string;
   type?: NotificationType;
-}
+} & NotificationActions;
 
-const Notification = ({ message, type, resetMessage }: IProps) => {
+const Notification = ({ message, type, resetMessage }: Props) => {
   const classes = useStyles();
   const Icon = type && variantIcon[type];
 
@@ -92,7 +92,7 @@ const Notification = ({ message, type, resetMessage }: IProps) => {
   );
 };
 
-const mapStateToProps = (state: IStateType) => ({
+const mapStateToProps = (state: GlobalState) => ({
   message: state.notification.message,
   type: state.notification.type,
 });

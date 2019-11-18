@@ -59,12 +59,12 @@ function resetAction() {
   };
 }
 
-export interface INotificationActions {
+export type NotificationActions = {
   showMessage: typeof showAction;
   resetMessage: typeof resetAction;
-}
+};
 
-export const notificationActions: INotificationActions = {
+export const notificationActions: NotificationActions = {
   showMessage: showAction,
   resetMessage: resetAction,
 };

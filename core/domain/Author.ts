@@ -16,16 +16,16 @@ export class Author implements IAuthor {
     return this._name === '';
   }
 
-  public static nameMaxLength = 100;
+  static nameMaxLength = 100;
 
-  public static clone(author: Author): Author {
+  static clone(author: Author): Author {
     const clone = new Author();
     clone.id = author.id;
     clone.name = author.name;
     return clone;
   }
 
-  public id?: string;
+  id?: string;
 
   private _name: string | undefined = undefined;
 }

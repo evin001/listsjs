@@ -59,11 +59,11 @@ function signInSuccess(userRef: UserRefType) {
   };
 }
 
-export interface IUserActions {
+export type UserActions = {
   signIn: typeof singInAction;
-}
+};
 
-export const userActions: IUserActions = {
+export const userActions: UserActions = {
   signIn: singInAction,
 };
 

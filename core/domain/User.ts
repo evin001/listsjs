@@ -6,7 +6,7 @@ export interface IUser {
 }
 
 export class User implements IUser {
-  public id?: string;
-  public email?: string;
-  public password?: string;
+  id?: string;
+  email?: string;
+  password?: string;
 }

@@ -5,7 +5,7 @@ import { IDataStoreProvider } from 'lists-core/boundaries/IDataStoreProvider';
 import { apiKey, projectId } from '~/frameworks';
 
 export class AppStoreProvider implements IDataStoreProvider {
-  public static getInstance() {
+  static getInstance() {
     if (!AppStoreProvider.instance) {
       AppStoreProvider.instance = new AppStoreProvider();
     }
@@ -17,7 +17,7 @@ export class AppStoreProvider implements IDataStoreProvider {
 
   private constructor() {}
 
-  public getStore(): any {
+  getStore(): any {
     if (!AppStoreProvider.store) {
       const app = firebase.initializeApp({
         apiKey,
